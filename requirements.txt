@@ -1,3 +1,4 @@
+ConfigArgParse==0.9.3
 Pillow==2.9.0
 PyPDF2==1.25.1
 Wand==0.4.1

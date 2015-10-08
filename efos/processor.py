@@ -4,6 +4,7 @@ import StringIO
 import time
 import json
 import re
+import shutil
 
 from wand.image import Image as WandImage
 from PIL import Image as PILImage
@@ -12,8 +13,9 @@ from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 import zbar
 
-
 log = logging.getLogger(__name__)
+
+EFOSSIG = '^efos\d#'
 
 
 class Barcode():
@@ -41,7 +43,7 @@ class Barcode():
             return True
 
         try:
-            self._efos_sig = re.match('^efos\d#', self.raw_data).group()
+            self._efos_sig = re.match(EFOSSIG, self.raw_data).group()
             self.raw_data = self.raw_data.replace(self._efos_sig, "")
             return True
         except:
@@ -68,7 +70,7 @@ class Page():
         image_stream = StringIO.StringIO()
         pdf_image = WandImage(blob=page_stream.getvalue())
         png_image = pdf_image.convert('png')
-        #self.image.type = 'grayscale'
+        # self.image.type = 'grayscale'
         png_image.save(file=image_stream)
 
         # Convert Image to B/W
@@ -97,12 +99,12 @@ class Page():
         # extract results
         self._barcodes = []
         for symbol in image:
-        # do something useful with results
+            # do something useful with results
             self._barcodes.append(Barcode(symbol.type, symbol.data))
-            #print 'decoded', symbol.type, 'symbol', '"%s"' % symbol.data
+        # print 'decoded', symbol.type, 'symbol', '"%s"' % symbol.data
 
         # clean up
-        del(image)
+        del (image)
         return self._barcodes
 
     @property
@@ -120,12 +122,11 @@ class Page():
             return self._efos_barcode
         return None
 
-
-    def get_ascii(self,):
+    def get_ascii(self, ):
         # resize to: the max of the img is maxLen
         img = self.pil_image.copy()
 
-        maxLen = 60.0   # default maxlen: 100px  # TODO: setting
+        maxLen = 60.0  # default maxlen: 100px  # TODO: setting
         width, height = img.size
 
         rate = maxLen / max(width, height)
@@ -155,7 +156,7 @@ class Page():
             ascii.write('|')
             for w in xrange(width):
                 rgb = pixel[w, h]
-                #string += "%s," % rgb
+                # string += "%s," % rgb
                 ascii.write(color[int(rgb / 256.0 * 16)])
             ascii.write('|')
             ascii.write('\n')
@@ -181,15 +182,16 @@ class File():
         pdf_file_writer = PdfFileWriter()
         for page in self.pages:
             pdf_file_writer.addPage(page.page)
-        with open("%s.pdf" % self.barcode.data.get('eid'), 'wb') as f:
-            pdf_file_writer.write(f)
+
+            # filename = os.path.join(path, filename)
+            # with open("./%s.pdf" % self.barcode.data.get('eid'), 'wb') as f:
+            #     pdf_file_writer.write(f)
 
 
 class Parser():
     def __init__(self, filename=None):
         self.files = []
         self.filename = filename
-
 
         try:
             if not os.path.exists(self.filename):
@@ -213,6 +215,7 @@ class Parser():
             elif file:
                 new_file.add(page)
 
+        # TODO: mabye splite this out to self.save()?
         for pdf_file in self.files:
             pdf_file.save()
 
@@ -225,6 +228,12 @@ class Parser():
 class ProcessEventHandler(PatternMatchingEventHandler):
     patterns = ('*pdf',)
 
+    def __init__(self, watch_directory=None, archive_directory=None, delete=False):
+        super(ProcessEventHandler, self).__init__()
+        self.watch_directory = watch_directory
+        self.archive_directory = archive_directory
+        self.delete = delete
+
     def on_created(self, event):
         super(ProcessEventHandler, self).on_created(event)
         time.sleep(1)
@@ -232,22 +241,40 @@ class ProcessEventHandler(PatternMatchingEventHandler):
         parser = Parser(filename=event.src_path)
         parser.parse()
 
+        log.debug("source file: %s" % event.src_path)
+        log.debug("archive folder: %s" % self.archive_directory)
+        log.debug(
+            "archive file: %s" % os.path.join(self.archive_directory, event.src_path.replace(self.watch_directory, "")[1:]))
+
+        if self.archive_directory:
+            archive_file = os.path.join(self.archive_directory, event.src_path.replace(self.watch_directory, "")[1:])
+            if self.delete:
+                os.rename(event.src_path, archive_file)
+            else:
+                shutil.copy(event.src_path, archive_file)
+
 
 class Processor():
-    def __init__(self, watch=None, archive=None, output=None):
+    def __init__(self, watch=None, archive=None, delete=False, output=None):
         self.watch_directory = watch
         self.archive_directory = archive
+        self.delete = delete
         self.output = output
         log.info("Processor created.")
 
         if not os.path.isdir(self.watch_directory):
-            log.info("Creating directory %s.", self.watch_directory)
+            log.info("Creating watch directory %s.", self.watch_directory)
             os.makedirs(self.watch_directory)
+
+        if self.archive_directory and not os.path.isdir(self.archive_directory):
+            log.info("Creating archive directory %s.", self.archive_directory)
+            os.makedirs(self.archive_directory)
 
     def run(self):
         log.info("Processor watching %s." % self.watch_directory)
-        event_handler = ProcessEventHandler()
+        event_handler = ProcessEventHandler(watch_directory=self.watch_directory,
+                                            archive_directory=self.archive_directory,
+                                            delete=self.delete)
         observer = Observer()
         observer.schedule(event_handler, self.watch_directory, recursive=False)
         observer.start()
-
