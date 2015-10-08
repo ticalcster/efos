@@ -1,11 +1,16 @@
 import SimpleHTTPServer
 import SocketServer
+import logging
 
-PORT = 8081
+log = logging.getLogger(__name__)
 
-Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+class WebServer():
+    def __init__(self):
+        self.port = 8081
+        self.handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+        self.httpd = SocketServer.TCPServer(("", self.port), self.handler)
 
-httpd = SocketServer.TCPServer(("", PORT), Handler)
+        log.info("serving at port: %s" % self.port)
 
-print "serving at port", PORT
-httpd.serve_forever()
+    def serve_forever(self):
+        self.httpd.serve_forever()
