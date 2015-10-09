@@ -5,6 +5,8 @@ import threading
 import time
 
 import configargparse
+import cherrypy
+from ws4py.messaging import TextMessage
 
 #from efos.processor import Processor
 from efos.webserver import WebServer
@@ -19,6 +21,7 @@ cap.add('-d', '--delete', action="store_true", help='delete files after processi
 cap.add('-f', '--file-format', default="%(filename)s", help='filename format from kwargs in QRCode')
 cap.add('-l', '--log-level', default=11, type=int, help='logging level [1-50+]')
 cap.add('-o', '--output', default="output", help='directory to output files')
+cap.add('-p', '--port', default=8081, type=int, help='web server port')
 cap.add('-w', '--watch', required=True, help='directory to watch for files')
 
 options = cap.parse_args()
@@ -42,18 +45,19 @@ if options.output:
 def websocket_timer(e, t):
     while not e.isSet():
         e.wait(t)
-        #cherrypy.engine.publish('websocket-broadcast', TextMessage('Times up!'))
+        cherrypy.engine.publish('websocket-broadcast', TextMessage('Times up!'))
         time.sleep(3)
+    log.info("stopping the Processor")
 
 
-# e = threading.Event()
-# t = threading.Thread(target=websocket_timer, args=(e, 1))
-# t.setDaemon(True)
-# t.start()
+e = threading.Event()
+t = threading.Thread(target=websocket_timer, args=(e, 1))
+t.setDaemon(True)
+t.start()
 
 
-httpd = WebServer()
+httpd = WebServer(port=options.port)
 httpd.start()
 
-# e.set()
-# t.join()
+e.set()
+t.join()
