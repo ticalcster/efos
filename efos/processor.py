@@ -17,7 +17,6 @@ log = logging.getLogger(__name__)
 
 EFOSSIG = '^efos\d#'
 
-
 class Barcode():
     def __init__(self, encoding, data):
         self._efos_sig = None
@@ -169,29 +168,49 @@ class Page():
 
 
 class File():
-    def __init__(self, barcode):
+    def __init__(self, barcode, filename_format=None):
+        self._filename_format = filename_format
         self.barcode = barcode
         self.pages = []
 
-        log.info("File found: %s" % barcode.raw_data)
+    @property
+    def page_count(self):
+        return len(self.pages)
+
+    @property
+    def basename(self):
+        return os.path.basename(self.filename)
+
+    @property
+    def filename(self):
+        return self._filename_format % self.barcode.data
 
     def add(self, page):
         self.pages.append(page)
 
-    def save(self, filename=None, path=None):
+    def save(self, output):
+        f = None
+        if isinstance(output, str):
+            f = open(output, 'wb')
+        else:
+            f = output
+        self.write(f)
+
+    def write(self, output):
         pdf_file_writer = PdfFileWriter()
         for page in self.pages:
             pdf_file_writer.addPage(page.page)
-
-            # filename = os.path.join(path, filename)
-            # with open("./%s.pdf" % self.barcode.data.get('eid'), 'wb') as f:
-            #     pdf_file_writer.write(f)
+        pdf_file_writer.write(output)
 
 
 class Parser():
-    def __init__(self, filename=None):
-        self.files = []
+    def __init__(self, filename=None, options=None):
+        if not options:
+            log.critical('No options passed to Processor')
+            raise ValueError('No Options')
+        self.options = options
         self.filename = filename
+        self.files = []
 
         try:
             if not os.path.exists(self.filename):
@@ -205,6 +224,10 @@ class Parser():
         except IOError as ex:
             print "I/O error({0}): {1}".format(ex.errno, ex.strerror)
 
+    @property
+    def file_count(self):
+        return len(self.files)
+
     def parse(self):
         new_file = None
         for pdf_page in self.pdf_file.pages:
@@ -215,66 +238,82 @@ class Parser():
             elif file:
                 new_file.add(page)
 
-        # TODO: mabye splite this out to self.save()?
+    def process(self):
         for pdf_file in self.files:
-            pdf_file.save()
+            pdf_file.save(pdf_file.filename)
 
     def new_file(self, barcode):
-        file = File(barcode)
+        file = File(barcode, filename_format=self.get_filename_format())
         self.files.append(file)
         return file
+
+    def get_filename_format(self):
+        return os.path.normpath(os.path.join(self.options.output, self.options.file_format))
 
 
 class ProcessEventHandler(PatternMatchingEventHandler):
     patterns = ('*pdf',)
 
-    def __init__(self, watch_directory=None, archive_directory=None, delete=False):
-        super(ProcessEventHandler, self).__init__()
-        self.watch_directory = watch_directory
-        self.archive_directory = archive_directory
-        self.delete = delete
+    def __init__(self, options=None, **kwargs):
+        super(ProcessEventHandler, self).__init__(**kwargs)
+        if not options:
+            log.critical('No options passed to Processor')
+            raise ValueError('No Options')
+        self.options = options
+
+        log.info("Output directory: %s" % self.options.output)
+        log.info("Archive directory: %s" % self.options.archive)
 
     def on_created(self, event):
         super(ProcessEventHandler, self).on_created(event)
         time.sleep(1)
         log.info(event.src_path)
-        parser = Parser(filename=event.src_path)
+        filename = event.src_path
+
+        # Parse the file
+        parser = Parser(filename=filename)
         parser.parse()
 
-        log.debug("source file: %s" % event.src_path)
-        log.debug("archive folder: %s" % self.archive_directory)
-        log.debug(
-            "archive file: %s" % os.path.join(self.archive_directory, event.src_path.replace(self.watch_directory, "")[1:]))
+        # log.debug("source file: %s" % event.src_path)
+        # log.debug("archive folder: %s" % self.options.archive)
+        # log.debug(
+        #     "archive file: %s" % os.path.join(self.options.archive, event.src_path.replace(self.options.archive, "")[1:]))
 
-        if self.archive_directory:
-            archive_file = os.path.join(self.archive_directory, event.src_path.replace(self.watch_directory, "")[1:])
-            if self.delete:
-                os.rename(event.src_path, archive_file)
+        # After Parsing, Archive and Delete
+        if self.options.archive:
+            archive_filename = os.path.join(self.options.archive, filename.replace(self.options.watch, "")[1:])
+            if self.options.delete:
+                os.rename(filename, archive_filename)
             else:
-                shutil.copy(event.src_path, archive_file)
+                shutil.copy(filename, archive_filename)
 
 
 class Processor():
-    def __init__(self, watch=None, archive=None, delete=False, output=None):
-        self.watch_directory = watch
-        self.archive_directory = archive
-        self.delete = delete
-        self.output = output
+    def __init__(self, options=None):
+        if not options:
+            log.critical('No options passed to Processor')
+            raise ValueError('No Options')
+        self.options = options
+
         log.info("Processor created.")
 
-        if not os.path.isdir(self.watch_directory):
-            log.info("Creating watch directory %s.", self.watch_directory)
-            os.makedirs(self.watch_directory)
+        if not os.path.isdir(self.options.watch):
+            log.info("Creating watch directory %s.", self.options.watch)
+            os.makedirs(self.options.watch)
 
-        if self.archive_directory and not os.path.isdir(self.archive_directory):
-            log.info("Creating archive directory %s.", self.archive_directory)
-            os.makedirs(self.archive_directory)
+        if self.options.archive and not os.path.isdir(self.options.archive):
+            log.info("Creating archive directory %s.", self.options.archive)
+            os.makedirs(self.options.watch)
 
     def run(self):
-        log.info("Processor watching %s." % self.watch_directory)
-        event_handler = ProcessEventHandler(watch_directory=self.watch_directory,
-                                            archive_directory=self.archive_directory,
-                                            delete=self.delete)
+        log.info("Processor watching %s." % self.options.watch)
+        event_handler = ProcessEventHandler(options=self.options)
         observer = Observer()
-        observer.schedule(event_handler, self.watch_directory, recursive=False)
+        observer.schedule(event_handler, self.options.watch, recursive=False)
         observer.start()
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            observer.stop()
+        observer.join()
