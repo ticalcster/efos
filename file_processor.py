@@ -1,11 +1,15 @@
 __author__ = 'kclark'
 import logging
 import os
+import threading
+import time
 
 import configargparse
 
-from efos.processor import Processor
+#from efos.processor import Processor
 from efos.webserver import WebServer
+#from efos.processor import websocket_timer
+
 
 # Config / Arg stuffs
 cap = configargparse.ArgParser(default_config_files=['efos.conf',])
@@ -32,9 +36,24 @@ if options.output:
     if not os.path.isabs(options.output):
         options.output = os.path.join(options.watch, options.output)
 
-processor = Processor(options=options)
-processor.run()
+#processor = Processor(options=options)
+#processor.run()
+
+def websocket_timer(e, t):
+    while not e.isSet():
+        e.wait(t)
+        #cherrypy.engine.publish('websocket-broadcast', TextMessage('Times up!'))
+        time.sleep(3)
 
 
-#httpd = WebServer()
-#httpd.serve_forever()
+# e = threading.Event()
+# t = threading.Thread(target=websocket_timer, args=(e, 1))
+# t.setDaemon(True)
+# t.start()
+
+
+httpd = WebServer()
+httpd.start()
+
+# e.set()
+# t.join()

@@ -6,6 +6,8 @@ import json
 import re
 import shutil
 
+import cherrypy
+from ws4py.messaging import TextMessage
 from wand.image import Image as WandImage
 from PIL import Image as PILImage
 from PyPDF2 import PdfFileReader, PdfFileWriter
@@ -16,6 +18,7 @@ import zbar
 log = logging.getLogger(__name__)
 
 EFOSSIG = '^efos\d#'
+
 
 class Barcode():
     def __init__(self, encoding, data):
@@ -239,8 +242,26 @@ class Parser():
                 new_file.add(page)
 
     def process(self):
+        if self.options.output:
+            self.save_output()
+
+        self.archive_delete()
+
+    def save_output(self):
         for pdf_file in self.files:
             pdf_file.save(pdf_file.filename)
+
+    def archive_delete(self):
+        # After Parsing, Archive and Delete
+        if self.options.archive:
+            archive_filename = os.path.join(self.options.archive, self.filename.replace(self.options.watch, "")[1:])
+            if self.options.delete:
+                os.rename(self.filename, archive_filename)
+            else:
+                shutil.copy(self.filename, archive_filename)
+        elif self.options.delete:
+            if os.path.exists(self.filename):
+                os.remove(self.filename)
 
     def new_file(self, barcode):
         file = File(barcode, filename_format=self.get_filename_format())
@@ -278,14 +299,6 @@ class ProcessEventHandler(PatternMatchingEventHandler):
         # log.debug("archive folder: %s" % self.options.archive)
         # log.debug(
         #     "archive file: %s" % os.path.join(self.options.archive, event.src_path.replace(self.options.archive, "")[1:]))
-
-        # After Parsing, Archive and Delete
-        if self.options.archive:
-            archive_filename = os.path.join(self.options.archive, filename.replace(self.options.watch, "")[1:])
-            if self.options.delete:
-                os.rename(filename, archive_filename)
-            else:
-                shutil.copy(filename, archive_filename)
 
 
 class Processor():

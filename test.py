@@ -1,6 +1,7 @@
 import unittest
 import os
 import StringIO
+import shutil
 
 from PyPDF2 import PdfFileReader
 
@@ -14,16 +15,28 @@ C = Cover Page = NR
 """
 
 
+
+
+
+def delete_file(filename):
+    if os.path.exists(filename):
+        os.remove(filename)
+
+
+def copy_file(src, dst):
+    shutil.copy(src, dst)
+
+
 class Options:
     def __init__(self, **kwargs):
-        self.watch = None
-        self.archive = "tests/archive"
-        self.output = "tests/output"
+        self.watch = os.path.join('tests')
+        self.archive = os.path.join('tests', 'archive')
+        self.output = os.path.join('tests', 'output')
         self.delete = False
         self.log_level = 11
         self.file_format = "%(eid)s.pdf"
 
-        for key, value in kwargs:
+        for key, value in kwargs.iteritems():
             setattr(self, key, value)
 
 
@@ -53,8 +66,7 @@ class TestFileMethods(unittest.TestCase):
         self.barcode = Barcode('QRCODE', 'efos1#{"eid": 600144}')
 
         self.save_as = os.path.join('tests', 'test_save.pdf')
-        if os.path.exists(self.save_as):
-            os.remove(self.save_as)
+        delete_file(self.save_as)
 
     def test_file_page_count(self):
         new_file = File(self.barcode, self.options.file_format)
@@ -90,12 +102,9 @@ class TestParserMethods(unittest.TestCase):
         self.filename = os.path.join('tests', 'doc_multi.pdf')
 
         self.file_600144 = os.path.join('tests', 'output', '600144.pdf')
-        if os.path.exists(self.file_600144):
-            os.remove(self.file_600144)
-
         self.file_600155 = os.path.join('tests', 'output', '600155.pdf')
-        if os.path.exists(self.file_600155):
-            os.remove(self.file_600155)
+        delete_file(self.file_600144)
+        delete_file(self.file_600155)
 
     def test_parser_init(self):
         parser = Parser(filename=self.filename, options=self.options)
@@ -115,8 +124,38 @@ class TestParserMethods(unittest.TestCase):
         self.assertTrue(os.path.isfile(self.file_600144))
         self.assertTrue(os.path.isfile(self.file_600155))
 
+    def test_parser_archive(self):
+        filename = os.path.join('tests', 'doc_multi_archive.pdf')
+        archive_filename = os.path.join('tests', 'archive', 'doc_multi_archive.pdf')
+        copy_file(self.filename, filename)
+        parser = Parser(filename=filename, options=Options(archive=os.path.join('tests', 'archive'), delete=False,
+                                                           file_format="%(eid)s_archive.pdf"))
+        parser.archive_delete()
+        self.assertTrue(os.path.exists(archive_filename))  # archived
+        self.assertTrue(os.path.exists(filename))  # deleted
 
+    def test_parser_delete(self):
+        filename = os.path.join('tests', 'doc_multi_delete.pdf')
+        archive_filename = os.path.join('tests', 'archive', 'doc_multi_delete.pdf')
+        copy_file(self.filename, filename)
+        parser = Parser(filename=filename, options=Options(archive="", delete=True,
+                                                           file_format="%(eid)s_delete.pdf"))
+        parser.archive_delete()
+        self.assertFalse(os.path.exists(archive_filename))  # archived
+        self.assertFalse(os.path.exists(filename))  # deleted
+
+    def test_parser_archive_delete(self):
+        filename = os.path.join('tests', 'doc_multi_archive_delete.pdf')
+        archive_filename = os.path.join('tests', 'archive', 'doc_multi_archive_delete.pdf')
+        copy_file(self.filename, filename)
+        parser = Parser(filename=filename, options=Options(archive=os.path.join('tests', 'archive'), delete=True,
+                                                           file_format="%(eid)s_archive_delete.pdf"))
+        parser.archive_delete()
+        self.assertTrue(os.path.exists(archive_filename))  # archived
+        self.assertFalse(os.path.exists(filename))  # deleted
 
 
 if __name__ == '__main__':
+    filelist = [os.remove(os.path.join('tests', 'archive', f)) for f in os.listdir(os.path.join('tests', 'archive')) if
+                f.endswith(".pdf")]
     unittest.main()
