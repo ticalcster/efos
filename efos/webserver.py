@@ -2,8 +2,12 @@ import threading
 import time
 import random
 import os
+import StringIO
+
+import pyqrcode
 
 import cherrypy
+from cherrypy.lib import file_generator
 
 from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.websocket import WebSocket
@@ -12,6 +16,12 @@ from ws4py.messaging import TextMessage
 cur_dir = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
 index_path = os.path.join(cur_dir,'html', 'index.html')
 index_page = file(index_path, 'r').read()
+
+
+from jinja2 import Environment, PackageLoader
+
+
+env = Environment(loader=PackageLoader('efos', 'html'))
 
 
 class ChatWebSocketHandler(WebSocket):
@@ -28,8 +38,29 @@ class ChatWebApp(object):
 
     @cherrypy.expose
     def index(self):
-        return index_page % {'username': "User%d" % random.randint(50, 1000),
-                             'ws_addr': 'ws://localhost:8081/ws'}
+        template = env.get_template('index.html')
+        return template.render(username=random.randint(50, 1000), ws_addr='ws://localhost:8081/ws')
+        # return index_page % {'username': "User%d" % random.randint(50, 1000),
+        #                      'ws_addr': 'ws://localhost:8081/ws'}
+
+    @cherrypy.expose
+    def generate(self):
+        template = env.get_template('generate.html')
+        return template.render()
+
+    @cherrypy.expose
+    def logs(self):
+        template = env.get_template('logs.html')
+        return template.render(ws_addr='ws://localhost:9000/ws')
+
+    @cherrypy.expose
+    def barcode(self, data, scale=4):
+        cherrypy.response.headers['Content-Type'] = "image/png"
+        buffer = StringIO.StringIO()
+        code = pyqrcode.create(data)
+        code.png(buffer, scale=scale)
+        buffer.seek(0)
+        return file_generator(buffer)
 
     @cherrypy.expose
     def ws(self):

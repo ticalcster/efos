@@ -7,6 +7,7 @@ import re
 import shutil
 
 import cherrypy
+
 from ws4py.messaging import TextMessage
 from wand.image import Image as WandImage
 from PIL import Image as PILImage

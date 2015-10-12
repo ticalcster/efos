@@ -1,0 +1,128 @@
+{% extends "layout.html" %}
+{% block content %}
+<div ng-controller="GenerateCtrl" ng-cloak>
+    <div class="row hidden-print">
+        {% raw %}
+        <div class="col-md-12">
+            <div class="well">
+                <div class="form-inline" ng-repeat="field in context_data">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="key"
+                               ng-model="field.key">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="value"
+                               ng-model="field.value">
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" ng-model="field.to"> to
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="value"
+                               ng-model="field.toValue" ng-show="field.to">
+                    </div>
+                    <button type="button" class="btn btn-danger">remove</button>
+                </div>
+                <button type="button" class="btn btn-success" ng-click="add_context_field()">add</button>
+            </div>
+            <!-- <img src="/barcode?data={{ data | escape }}"> -->
+            <pre>{{ get_context() }}</pre>
+        </div>
+        <div class="col-md-12">
+            <div class="form-inline">
+                <button type="submit" class="btn btn-default" ng-click="preview()">Preview</button>
+                <select class="form-control" ng-model="layout">
+                    <option value="left">Left</option>
+                    <option value="right">Right</option>
+                </select>
+                {{ layout }}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row" ng-repeat="context in generated_context track by $index">
+                <div class="col-xs-6" ng-class="{'col-xs-offset-6': layout == 'right'}">
+                    <img src="/barcode?data={{ context | escape }}"/>
+                    <dl class="dl-horizontal" ng-repeat="field in context">
+                        <dt>{{ field.key }}</dt>
+                        <dd>{{ field.value }}</dd>
+                    </dl>
+
+                </div>
+            </div>
+        </div>
+        {% endraw %}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    myApp.controller('GenerateCtrl', ['$scope', function ($scope) {
+        function calculate_values(from, to) {
+            from_to = [];
+            for (var i = parseInt(from); i <= parseInt(to); i++) {
+                from_to.push(i)
+            }
+            return from_to
+        }
+
+        function getValues(field) {
+            if (field.to) {
+                return calculate_values(field.value, field.toValue)
+            } else {
+                return [field.value]
+            }
+        }
+
+        function combine_rows(rows, key, values) {
+            var new_rows = [];
+            for (var i = 0; i < rows.length; i++) {
+                for (var j = 0; j < values.length; j++) {
+                    var new_row = rows[i].concat();
+                    new_row.push({key: key, value: values[j]});
+                    new_rows.push(new_row)
+                }
+            }
+            return new_rows;
+        }
+
+        $scope.layout = 'left';
+        $scope.SIG = 'efos1#';
+        $scope.generated_context = [];
+        $scope.context_data = [];
+        $scope.add_context_field = function () {
+            $scope.context_data.push({key: '', value: '', to: false, toValue: 0})
+        };
+        $scope.get_context = function () {
+            return $scope.context_data
+        };
+        $scope.preview = function () {
+            fields = [];
+            $scope.generated_context = [];
+
+            var rows = [[]];
+
+            for (var field_i = 0; field_i < $scope.context_data.length; field_i++) {
+                var key = $scope.context_data[field_i].key;
+                var values = getValues($scope.context_data[field_i]);
+
+                rows = combine_rows(rows, key, values)
+            }
+
+            //add_row([], 0, fields, $scope.generated_context);
+
+            $scope.generated_context = rows;
+        };
+        $scope.generate_efos = function (row) {
+            var str = $scope.SIG
+
+        }
+
+    }]);
+
+</script>
+{% endblock %}
