@@ -13,13 +13,7 @@ from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.websocket import WebSocket
 from ws4py.messaging import TextMessage
 
-cur_dir = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
-index_path = os.path.join(cur_dir,'html', 'index.html')
-index_page = file(index_path, 'r').read()
-
-
 from jinja2 import Environment, PackageLoader
-
 
 env = Environment(loader=PackageLoader('efos', 'html'))
 
@@ -33,15 +27,15 @@ class ChatWebSocketHandler(WebSocket):
 
 
 class ChatWebApp(object):
-    # def __init__(self):
+    # def __init__(self, host, port):
     #     super(ChatWebApp, self).__init__()
+    #     self.ws_addr = "ws://%s:%s/ws" % (host, port)
 
     @cherrypy.expose
     def index(self):
+        ws_addr = "ws://%s/ws" % cherrypy.request.headers['host']
         template = env.get_template('index.html')
-        return template.render(username=random.randint(50, 1000), ws_addr='ws://localhost:8081/ws')
-        # return index_page % {'username': "User%d" % random.randint(50, 1000),
-        #                      'ws_addr': 'ws://localhost:8081/ws'}
+        return template.render(ws_addr=ws_addr)
 
     @cherrypy.expose
     def generate(self):
@@ -50,8 +44,9 @@ class ChatWebApp(object):
 
     @cherrypy.expose
     def logs(self):
+        ws_addr = "ws://%s/ws" % cherrypy.request.headers['host']
         template = env.get_template('logs.html')
-        return template.render(ws_addr='ws://localhost:9000/ws')
+        return template.render(ws_addr=ws_addr)
 
     @cherrypy.expose
     def barcode(self, data, scale=4):
@@ -68,7 +63,7 @@ class ChatWebApp(object):
 
 
 class WebServer:
-    def __init__(self, host='0.0.0.0', port=8081, index='index.html'):
+    def __init__(self, host='0.0.0.0', port=8081):
         self.port = port
         self.host = host
 

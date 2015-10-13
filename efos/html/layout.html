@@ -32,7 +32,7 @@
     </style>
 </head>
 
-<body>
+<body {% block ngdeclare %}{% endblock %}>
 
 <!-- Fixed navbar -->
 <nav class="navbar navbar-default navbar-fixed-top">
@@ -53,9 +53,7 @@
                 <li><a href="/logs">Logs</a></li>
                 <li><a href="/settings">Settings</a></li>
             </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="#">Link</a></li>
-            </ul>
+            {% block navbar %}{% endblock %}
         </div>
         <!--/.nav-collapse -->
     </div>
