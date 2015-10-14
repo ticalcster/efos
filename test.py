@@ -5,7 +5,8 @@ import shutil
 
 from PyPDF2 import PdfFileReader
 
-from efos.processor import Processor, Parser, File, Page, Barcode
+from efos.processor import Processor
+from efos.parser import Parser, File, Page, Barcode
 
 """
 N = New File

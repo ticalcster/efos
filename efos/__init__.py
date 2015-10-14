@@ -1,13 +1,15 @@
+import logging.config
 
 LOGGING_CONFIG = {
     'version': 1,
-    #'disable_existing_loggers': False,
+    # 'disable_existing_loggers': False,
     'formatters': {
         'void': {
             'format': ''
         },
         'standard': {
-            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+            'format': '%(asctime)-15s %(levelname)s %(name)s %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S'
         },
     },
     'handlers': {
@@ -16,6 +18,12 @@ LOGGING_CONFIG = {
             'class': 'logging.StreamHandler',
             'formatter': 'standard',
             'stream': 'ext://sys.stdout'
+        },
+        'cherrypy_ws': {
+            'level': 'DEBUG',
+            'class': 'efos.logger.WSHandler',
+            'formatter': 'standard',
+            # 'stream': 'ext://sys.stdout'
         },
         'cherrypy_console': {
             'level': 'INFO',
@@ -44,12 +52,17 @@ LOGGING_CONFIG = {
     },
     'loggers': {
         '': {
-            'handlers': ['default'],
-            'level': 'INFO'
+            'handlers': ['default', 'cherrypy_ws'],
+            'level': 'DEBUG'
         },
         'db': {
             'handlers': ['default'],
             'level': 'INFO',
+            'propagate': False
+        },
+        'ws4py': {
+            'handlers': ['default'],
+            'level': 'ERROR',
             'propagate': False
         },
         'cherrypy.access': {
@@ -64,3 +77,4 @@ LOGGING_CONFIG = {
         },
     }
 }
+logging.config.dictConfig(LOGGING_CONFIG)

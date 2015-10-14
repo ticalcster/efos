@@ -31,7 +31,7 @@ options = cap.parse_args()
 FORMAT = '%(message)s'
 #logging.basicConfig(level=options.log_level)
 log = logging.getLogger()
-logging.config.dictConfig(LOGGING_CONFIG)
+
 
 if options.archive:
     if not os.path.isabs(options.archive):
@@ -53,14 +53,15 @@ def websocket_timer(e, t):
     log.info("stopping the Processor")
 
 
-e = threading.Event()
-t = threading.Thread(target=websocket_timer, args=(e, 1))
-t.setDaemon(True)
-t.start()
+# e = threading.Event()
+# t = threading.Thread(target=websocket_timer, args=(e, 1))
+# t.setDaemon(True)
+# t.start()
 
 httpd = WebServer(port=options.port)
 httpd.start()
 
-e.set()
-t.join()
+# e.set()
+# t.join()
 observer.stop()
+observer.join()

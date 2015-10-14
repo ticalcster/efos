@@ -13,6 +13,16 @@ from efos.parser import Parser
 log = logging.getLogger()
 
 
+class EfosObserver(Observer):
+    def on_thread_start(self):
+        log.info("Starting observer")
+        super(EfosObserver, self).on_thread_start()
+
+    def on_thread_stop(self):
+        log.info("Stopping observer")
+        super(EfosObserver, self).on_thread_stop()
+
+
 class ProcessEventHandler(PatternMatchingEventHandler):
     patterns = ('*pdf',)
 
@@ -27,7 +37,6 @@ class ProcessEventHandler(PatternMatchingEventHandler):
         super(ProcessEventHandler, self).on_created(event)
         time.sleep(1)  # TODO: remove
         log.info(event.src_path)
-        cherrypy.engine.publish('websocket-broadcast', TextMessage(event.src_path))
         filename = event.src_path
 
         # Parse the file
@@ -68,7 +77,7 @@ class Processor():
         log.info("Archive directory: %s" % self.options.archive)
 
         event_handler = ProcessEventHandler(options=self.options)
-        observer = Observer()
+        observer = EfosObserver()
         observer.schedule(event_handler, self.options.watch, recursive=False)
         observer.start()
         return observer
