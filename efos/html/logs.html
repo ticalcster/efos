@@ -21,14 +21,14 @@
 {% endblock %}
 {% block content %}
 {% raw %}
-<div class="row">
+<div class="row logging">
     <div class="col-xs-12 bg-danger">err</div>
     <div class="col-xs-12 bg-warning">log</div>
     <div class="col-xs-12 ">info</div>
     <div class="col-xs-12 bg-success">success</div>
     <div class="col-xs-12 bg-primary">yeah</div>
-    <div class="col-xs-12" ng-repeat="record in log track by $index">
-        {{ record }}
+    <div class="col-xs-12 bg-{{ record.level }}" ng-repeat="record in log track by $index">
+        {{ record.created }} {{ record.name }} {{ record.funcName }} {{ record.message }}
     </div>
 </div>
 <div id="bottom" class="row"></div>
@@ -48,7 +48,9 @@
                 e.preventDefault();
             };
             $scope.ws.onmessage = function (evt) {
-                $scope.log.push(evt.data);
+                var record = JSON.parse(evt.data);
+
+                $scope.log.push(record);
                 $scope.$apply();
                 if ($scope.autoscroll) {
                     $location.hash('bottom');

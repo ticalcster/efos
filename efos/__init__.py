@@ -52,7 +52,11 @@ LOGGING_CONFIG = {
     },
     'loggers': {
         '': {
-            'handlers': ['default', 'cherrypy_ws'],
+            'handlers': ['default'],
+            'level': 'DEBUG'
+        },
+        'efos': {
+            'handlers': ['cherrypy_ws'],
             'level': 'DEBUG'
         },
         'db': {

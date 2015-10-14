@@ -22,12 +22,23 @@
         body {
             padding-top: 70px;
         }
+
+        .logging {
+            font-family: monospace;
+        }
+
+        .navbar-form.form-group-sm {
+            padding-top: 5px;
+        }
+
         [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
             display: none !important;
         }
 
         @media print {
-            .row {page-break-after: always;}
+            .row {
+                page-break-after: always;
+            }
         }
     </style>
 </head>
@@ -77,6 +88,18 @@
         return function (input) {
             if (input) {
                 return window.encodeURIComponent(input);
+            }
+            return "";
+        }
+    });
+    myApp.filter('datetime', function () {
+        return function (input) {
+            if (input) {
+                var date = new Date(input * 1000);
+                var year = date.getFullYear();
+                var month = date.getMonth();
+                var day = date.getDay();
+                return "" + year + "-";
             }
             return "";
         }

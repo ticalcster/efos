@@ -1,6 +1,20 @@
 {% extends "layout.html" %}
+{% block ngdeclare %}ng-controller="GenerateCtrl"{% endblock %}
+{% block navbar %}
+<ul class="nav navbar-nav navbar-right">
+    <li>
+        <div class="navbar-form navbar-left form-group-sm">
+            <select class="form-control" ng-model="layout">
+                <option value="left">Left</option>
+                <option value="right">Right</option>
+            </select>
+            <button type="submit" class="btn btn-default btn-sm" ng-click="preview()">Generate</button>
+        </div>
+    </li>
+</ul>
+{% endblock %}
 {% block content %}
-<div ng-controller="GenerateCtrl" ng-cloak>
+<div ng-cloak>
     <div class="row hidden-print">
         {% raw %}
         <div class="col-md-12">
@@ -29,15 +43,6 @@
             </div>
             <!-- <img src="/barcode?data={{ data | escape }}"> -->
             <pre>{{ get_context() }}</pre>
-        </div>
-        <div class="col-md-12">
-            <div class="form-inline">
-                <button type="submit" class="btn btn-default" ng-click="preview()">Preview</button>
-                <select class="form-control" ng-model="layout">
-                    <option value="left">Left</option>
-                    <option value="right">Right</option>
-                </select>
-            </div>
         </div>
     </div>
     <div class="row">

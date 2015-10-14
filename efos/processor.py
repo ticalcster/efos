@@ -10,7 +10,7 @@ from watchdog.events import PatternMatchingEventHandler
 
 from efos.parser import Parser
 
-log = logging.getLogger()
+log = logging.getLogger('efos')
 
 
 class EfosObserver(Observer):

@@ -10,7 +10,7 @@ from PIL import Image as PILImage
 from PyPDF2 import PdfFileReader, PdfFileWriter
 import zbar
 
-log = logging.getLogger()
+log = logging.getLogger('efos')
 
 EFOSSIG = '^efos\d#'
 
