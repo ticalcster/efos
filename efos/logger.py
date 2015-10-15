@@ -31,7 +31,7 @@ class WSHandler(Handler):
     #     self.colors = colors
 
     bootstrap_levels = {'CRITICAL': 'danger',
-                        'ERROR': 'warning',
+                        'ERROR': 'danger',
                         'WARNING': 'warning',
                         'INFO': '',
                         'DEBUG': 'primary',
@@ -46,8 +46,13 @@ class WSHandler(Handler):
                 'level': self.bootstrap_levels[record.levelname],
                 'message': record.getMessage(),
                 'funcName': record.funcName,
+                'module': record.module,
+                'pathname': record.pathname,
+                'filename': record.filename
             }
             cherrypy.engine.publish('websocket-broadcast', json.dumps(msg))
         except:
             print sys.exc_info()[1]
             self.handleError(record)
+
+

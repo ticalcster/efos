@@ -10,7 +10,7 @@ from PIL import Image as PILImage
 from PyPDF2 import PdfFileReader, PdfFileWriter
 import zbar
 
-log = logging.getLogger('efos')
+from efos import log, get_handlers
 
 EFOSSIG = '^efos\d#'
 
@@ -18,7 +18,8 @@ EFOSSIG = '^efos\d#'
 class Barcode():
     def __init__(self, encoding, data):
         self._efos_sig = None
-        self.type = encoding
+        self.type = encoding  # QRCODE
+        self.raw = data
         self.raw_data = data
         self.data = data
 
@@ -79,8 +80,6 @@ class Page():
 
         width, height = img.size
         raw = img.tostring()
-
-
 
         # create a reader
         scanner = zbar.ImageScanner()
@@ -170,6 +169,8 @@ class File():
         self._filename_format = filename_format
         self.barcode = barcode
         self.pages = []
+        self._filename = None
+        self.valid_filename = False
 
     @property
     def page_count(self):
@@ -177,22 +178,23 @@ class File():
 
     @property
     def basename(self):
-        return os.path.basename(self.filename)
+        return os.path.basename(self.get_filename())
 
-    @property
-    def filename(self):
-        return self._filename_format % self.barcode.data
+    def get_filename(self):
+        if self._filename:
+            return self._filename
+
+        self._filename = self.barcode.raw
+        try:
+            self._filename = self._filename_format % self.barcode.data
+        except KeyError as ex:
+            log.warning("Barcode does not contain %s which is required by file-format" % ex)
+        except Exception as ex:
+            log.error("%(type)s: %(msg)s" % {'type': type(ex).__name__, 'msg': ex.message, 'args': ex.args})
+        return self._filename
 
     def add(self, page):
         self.pages.append(page)
-
-    def save(self, output):
-        f = None
-        if isinstance(output, str):
-            f = open(output, 'wb')
-        else:
-            f = output
-        self.write(f)
 
     def write(self, output):
         pdf_file_writer = PdfFileWriter()
@@ -209,6 +211,7 @@ class Parser():
         self.options = options
         self.filename = filename
         self.files = []
+        self.handlers = get_handlers(self.options)
 
         try:
             if not os.path.exists(self.filename):
@@ -233,30 +236,32 @@ class Parser():
 
             if page.is_efos:
                 new_file = self.new_file(page.get_barcode())
+                log.info("Creating page %s" % new_file.get_filename())
             elif file:
                 new_file.add(page)
+                log.debug("Adding page to %s" % new_file.get_filename())
 
     def process(self):
-        if self.options.output:
-            self.save_output()
+        for file in self.files:
+            for handler in self.handlers:
+                handler.process(file)
 
         self.archive_delete()
-
-    def save_output(self):
-        for pdf_file in self.files:
-            pdf_file.save(pdf_file.filename)
 
     def archive_delete(self):
         # After Parsing, Archive and Delete
         if self.options.archive:
             archive_filename = os.path.join(self.options.archive, self.filename.replace(self.options.watch, "")[1:])
             if self.options.delete:
+                log.info("Moving file %s to %s" % (self.filename, archive_filename))
                 os.rename(self.filename, archive_filename)
             else:
+                log.info("Archiving file %s to %s" % (self.filename, archive_filename))
                 shutil.copy(self.filename, archive_filename)
         elif self.options.delete:
             if os.path.exists(self.filename):
                 os.remove(self.filename)
+                log.info("Removing file %s" % (self.filename,))
 
     def new_file(self, barcode):
         file = File(barcode, filename_format=self.get_filename_format())
