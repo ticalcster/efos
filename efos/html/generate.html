@@ -49,8 +49,9 @@
         <div class="col-md-12">
             <div class="row" ng-repeat="context in generated_context track by $index">
                 <div class="col-xs-6" ng-class="{'col-xs-offset-6': layout == 'right'}">
-                    <img src="/barcode?data={{ context | escape }}"/>
-                    <dl class="dl-horizontal" ng-repeat="field in context">
+                    <img src="/barcode?data={{ context.efosString | escape }}"/>
+                    <pre>{{ context.efosString }}</pre>
+                    <dl class="dl-horizontal" ng-repeat="field in context.data">
                         <dt>{{ field.key }}</dt>
                         <dd>{{ field.value }}</dd>
                     </dl>
@@ -84,17 +85,22 @@
         function combine_rows(rows, key, values) {
             var new_rows = [];
             for (var i = 0; i < rows.length; i++) {
+                var row = {'efosString': 'efos1#c#eid=600144', data: []};
+                var new_row = [];
                 for (var j = 0; j < values.length; j++) {
-                    var new_row = rows[i].concat();
+                    new_row = rows[i].data.concat();
+                    // new_row.push({'efosString': 'efos1#c#eid=600144', data: {key: key, value: values[j]}});
                     new_row.push({key: key, value: values[j]});
-                    new_rows.push(new_row)
+                    //row.data.push(new_row)
                 }
+                row.data = new_row;
+                new_rows.push(row)
             }
             return new_rows;
         }
 
         $scope.layout = 'left';
-        $scope.SIG = 'efos1#';
+        $scope.EFOS_SIG = 'efos1#c#';
         $scope.generated_context = [];
         $scope.context_data = [];
         $scope.add_context_field = function () {
@@ -107,7 +113,7 @@
             fields = [];
             $scope.generated_context = [];
 
-            var rows = [[]];
+            var rows = [{efosString: '', data: []}];
 
             for (var field_i = 0; field_i < $scope.context_data.length; field_i++) {
                 var key = $scope.context_data[field_i].key;
@@ -118,11 +124,22 @@
 
             //add_row([], 0, fields, $scope.generated_context);
 
-            $scope.generated_context = rows;
-        };
-        $scope.generate_efos = function (row) {
-            var str = $scope.SIG
+            for(var i = 0; i < rows.length; i++) {
+                rows[i].efosString = $scope.generate_efos(rows[i].data);
+            }
 
+            $scope.generated_context = rows;
+            console.log(rows)
+        };
+        $scope.generate_efos = function (data) {
+            var str = '';
+            for(var i = 0; i < data.length; i++){
+                if(str !== '') {
+                    str = str + '&'
+                }
+                str = str + data[i].key + '=' + data[i].value;
+            }
+            return $scope.EFOS_SIG + str;
         }
 
     }]);

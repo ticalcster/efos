@@ -26,7 +26,7 @@
 {% block content %}
 {% raw %}
 <div class="row logging">
-    <div class="col-xs-12 bg-{{ record.level }}" ng-repeat="record in log track by $index" ng-cloak>
+    <div class="col-xs-12 text-{{ record.level }}" ng-repeat="record in log track by $index" ng-cloak>
         {{ record.created }} {{ record.funcName }}: <strong>{{ record.message }}</strong>
     </div>
 </div>

@@ -33,9 +33,8 @@ class WSHandler(Handler):
     bootstrap_levels = {'CRITICAL': 'danger',
                         'ERROR': 'danger',
                         'WARNING': 'warning',
-                        'INFO': '',
-                        'DEBUG': 'primary',
-                        'DEBUG': 'primary', }
+                        'INFO': 'primary',
+                        'DEBUG': 'muted'}
 
     def emit(self, record):
         self.format(record)

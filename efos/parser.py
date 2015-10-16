@@ -4,30 +4,33 @@ import StringIO
 import json
 import re
 import shutil
+import urlparse
 
 from wand.image import Image as WandImage
 from PIL import Image as PILImage
 from PyPDF2 import PdfFileReader, PdfFileWriter
 import zbar
 
-from efos import log, get_handlers
-
-EFOSSIG = '^efos\d#'
+from efos import log, get_handlers, EFOS_SIG
 
 
 class Barcode():
     def __init__(self, encoding, data):
         self._efos_sig = None
+        self._is_efos = False
         self.type = encoding  # QRCODE
         self.raw = data
         self.raw_data = data
-        self.data = data
+        self._data = data
 
-        if self.is_efos:
-            try:
-                self.data = json.loads(self.raw_data)
-            except:
-                log.error("Could not parse json from QR Code.")
+        self.cover_page = False
+        self.merge = False
+        self.new_page = False
+        self.remove_page = False
+
+        self._child_list = []
+
+        self._parse_data()
 
     @property
     def efos_sig(self):
@@ -37,17 +40,43 @@ class Barcode():
 
     @property
     def is_efos(self):
-        if self._efos_sig:
-            return True
+        return self._is_efos
+
+    def _parse_data(self):
         try:
-            self._efos_sig = re.match(EFOSSIG, self.raw_data).group()
+            self._efos_sig = re.match(EFOS_SIG, self.raw_data).group()  # find the efos sig
             self.raw_data = self.raw_data.replace(self._efos_sig, "")
+            self._is_efos = True
             log.debug('efos sig found: %s' % self.raw_data)
-            return True
+            self._parse_efos_data()
+            self._parse_qs_data()
         except:
             pass
         log.debug('regex not found: %s' % self.raw_data)
-        return False
+
+    def _parse_efos_data(self):
+        self.cover_page = True if re.match("efos\d#[mnr]*[c][mnr]*#", self.efos_sig) else False
+        self.merge = True if re.match("efos\d#[cnr]*[m][cnr]*#", self.efos_sig) else False
+        self.new_page = True if re.match("efos\d#[mr]*[cn][mr]*#", self.efos_sig) else False
+        self.remove_page = True if re.match("efos\d#[mn]*[cr][mn]*#", self.efos_sig) else False
+
+    def _parse_qs_data(self):
+        self._data = urlparse.parse_qs(self.raw_data)
+        for key, value in self._data.iteritems():
+            self._data[key] = value[0]
+
+    def push(self, barcode):
+        self._child_list.append(barcode)
+
+    def pop(self):
+        return self._child_list.pop()
+
+    @property
+    def data(self):
+        ret_data = dict(self._data)
+        for child in self._child_list:
+            ret_data.update(child.data)
+        return ret_data
 
 
 class Page():
@@ -221,7 +250,7 @@ class Parser():
             elif not os.access(self.filename, os.R_OK):
                 print "File cannot be read."
             else:
-                self.pdf_file = PdfFileReader(self.filename)
+                self.pdf_file = PdfFileReader(self.filename, strict=False)
         except IOError as ex:
             print "I/O error({0}): {1}".format(ex.errno, ex.strerror)
 
@@ -237,11 +266,14 @@ class Parser():
             if page.is_efos:
                 new_file = self.new_file(page.get_barcode())
                 log.info("Creating page %s" % new_file.get_filename())
-            elif file:
+            elif new_file:
                 new_file.add(page)
                 log.debug("Adding page to %s" % new_file.get_filename())
 
     def process(self):
+        if len(self.files) == 0:
+            log.warning("No efos files found")
+
         for file in self.files:
             for handler in self.handlers:
                 handler.process(file)
@@ -253,7 +285,8 @@ class Parser():
         if self.options.archive:
             archive_filename = os.path.join(self.options.archive, self.filename.replace(self.options.watch, "")[1:])
             if self.options.delete:
-                log.info("Moving file %s to %s" % (self.filename, archive_filename))
+                log.info("Archiving file %s to %s" % (self.filename, archive_filename))
+                log.info("Removing file %s" % (self.filename,))
                 os.rename(self.filename, archive_filename)
             else:
                 log.info("Archiving file %s to %s" % (self.filename, archive_filename))

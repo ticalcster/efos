@@ -7,6 +7,8 @@ import configargparse
 
 __all__ = ('log', 'get_options', 'get_handlers')
 
+EFOS_SIG = '^efos\d#[cmnr]{0,4}#'
+
 LOGGING_CONFIG = {
     'version': 1,
     # 'disable_existing_loggers': False,
@@ -25,6 +27,15 @@ LOGGING_CONFIG = {
             'class': 'logging.StreamHandler',
             'formatter': 'standard',
             'stream': 'ext://sys.stdout'
+        },
+        'efos_file': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'standard',
+            'filename': 'efos.log',
+            'maxBytes': 10485760,
+            'backupCount': 20,
+            'encoding': 'utf8'
         },
         'cherrypy_ws': {
             'level': 'DEBUG',
@@ -63,7 +74,7 @@ LOGGING_CONFIG = {
             'level': 'DEBUG'
         },
         'efos': {
-            'handlers': ['cherrypy_ws'],
+            'handlers': ['cherrypy_ws', 'efos_file'],
             'level': 'DEBUG'
         },
         'db': {
@@ -95,7 +106,7 @@ log = logging.getLogger('efos')
 def get_handlers(options):
     handlers = []
     for handler in get_handler_classes(options):
-            handlers.append(handler(options))
+        handlers.append(handler(options))
     return handlers
 
 
@@ -117,7 +128,7 @@ def get_options():
     cap.add_argument('-c', '--config', is_config_file=True, help='path to config file')
     cap.add_argument('-d', '--delete', action="store_true", help='delete files after processing')
     cap.add_argument('-f', '--file-format', default="%(filename)s", help='filename format from kwargs in QRCode')
-    cap.add_argument('--handlers', nargs='+', default=['efos.handler.FileHandler'],
+    cap.add_argument('--handlers', nargs='+', default=['efos.handler.FileHandler', 'efos.handler.HttpHandler'],
                      help='handlers to use when processing parsed files')
     cap.add_argument('-l', '--log-level', default=11, type=int, help='logging level [1-50+]')
     cap.add_argument('-p', '--port', default=8081, type=int, help='web server port')

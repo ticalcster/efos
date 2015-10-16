@@ -1,0 +1,541 @@
+
+
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1"><title>
+	Manager - EDUStaff, LLC
+</title>
+    <script type="text/javascript">
+        var DistrictSetup = false;
+        var IsEDU = false;
+        var IsAdmin = false;
+        var IsHourly = false;
+        var ManageContacts = false;
+        var ProcessPayroll = false;
+        var ManageAccounts = false;
+        var ManageTimeTracker = false;
+        var ManageNonAesop = false;
+        var AesopImports = false;
+        var OnlyManageSelfTT = false;
+    </script>
+    <script src="/Scripts/jquery-1.10.2.min.js" type="text/javascript"></script>
+    <script src="/include/js/edustaff.min.js" type="text/javascript"></script>
+    <link href="/include/css/bootstrap-edu-glyphicons.css" rel="stylesheet" type="text/css" /><link href="/Styles/master.css" rel="stylesheet" type="text/css" /><link href="/Styles/jScrollPane.css" rel="stylesheet" type="text/css" /><link rel="shortcut icon" href="/Images/favicon.ico" type="image/x-icon" /><link href="/Styles/jquery.loadmask.css" rel="stylesheet" type="text/css" /><link href="/Styles/jquery.treeview.css" rel="stylesheet" type="text/css" /><link href="/fancy/jquery.fancybox-1.3.1.css" rel="stylesheet" type="text/css" /><link href="/Styles/tablesorter/style.css" rel="stylesheet" type="text/css" /><link href="/Styles/jtip.css" rel="stylesheet" type="text/css" />
+    <script src="/Scripts/jquery.corner-2.13.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery.backopacity.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery.mousewheel-3.1.6.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery.scrollTo-min.js" type="text/javascript"></script>
+    <script src="/Scripts/jScrollPane.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery.qtip2-2.2.0.min.js" type="text/javascript"></script>
+    <script src="/Scripts/validation.js" type="text/javascript"></script>
+    <script src="/Scripts/masterfunctions.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery.maskedinput-1.3.1.js" type="text/javascript"></script>
+    <script src="/fancy/jquery.fancybox-1.3.1.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery.loadmask.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery.quicksearch.js" type="text/javascript"></script>
+    <script src="/Scripts/formstyle.js" type="text/javascript"></script>
+    <script src="/Scripts/jtips.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery.treeview.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery.printElement.js" type="text/javascript"></script>
+    <script src="/scripts/einfo.js" type="text/javascript"></script>
+    
+    <script src="/Scripts/browsercheck.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+      m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-44289609-4', 'edustaffonline.com');
+        ga('create', 'UA-44289609-5', { 'name': 'rollupTracker' });
+
+        ga('send', 'pageview');
+        ga('rollupTracker.send', 'pageview');
+
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <form method="post" action="" id="form1">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUKMTk2MzY3OTExNg9kFgJmD2QWAgIDD2QWAgIBD2QWAmYPFgIeBWNsYXNzBQdhY3RpdmUgZGRFpEgD8LbofTFEsF+jobOyabgNYnCnp19KujPfzx47ig==" />
+
+
+<script src="/ScriptResource.axd?d=8fQYY1WvKEbqRz_Ms0W21mQEa8qGadXyWfUhGzhBcKasHQvM5aNfGK64D2VfwekNxzG_rU0ZSHq8sLmtJqgnIWWeGZyAwLfHsPBL7k2h4bbipeB4gWtmOSVWZJAKXySCt2pVACgsdcD9BeIMDdfURAXIbxQtY45G2J8dmfvjBJF8hicFQh3MSNtyp3LKuOIY0&amp;t=ffffffff805766b3" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+if (typeof(Sys) === 'undefined') throw new Error('ASP.NET Ajax client-side framework failed to load.');
+//]]>
+</script>
+
+<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="CA0B0334" />
+<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/wEdABWdcJhtcQjZBeWjoNZQFk9A6EjQR4lZzpzCn4el7Nt20rwd47T5hp0rREWbmA0Xj5Bb2Iu15HgoCrJQIjVG88vpEVxXPOch/Koe+aPkrCQcHUpERJh9Md863SOT5sK03he4MHUdM833cceHhhIBhEsyioHzejPoFjsUfCiQCljS13SiZtGq0RBOHQoYTX1z1O0LXaquSmmDQAS8LX2bKjKcD3w3GDo8TUWdge7nMLB2OqXqO9Dy5c+9SIA2PEc3l55HoSBFNlzrPFsmiLatN3zMhvg+5s99sUd/eycKhAzJzDTSHeGpbvzNFV3vSSA8FpdXD2+c0BKU/kkw0nI+Hsroy6Sc84wKMJNUHena/cKK1Zb1nHoGgPyiwNEaJ8c11qdlh9Zpd3YeRqTbBb8+I1aZsBBgkuG8biArERj5Q/U3PN9ub09VmhX1H5MO9wgI2Ze3ZSfZHeMTbYnkhQCsAniyQ+jvmQ8KckNZDzQJ8mlwaA==" />
+        
+        <div id="header">
+            <a href="https://www.edustaff.org/" target="_blank">
+                <img src="/Images/Layout/logo.png" alt="EDUStaff, LLC" /></a>
+        </div>
+        <div id="body">
+            <div class="nav-main">
+                <h4>
+                    Manager</h4>
+                <ul><li class="active "><a href="/default.aspx">Home</a></li><li><a href="/forgot.aspx">Forgot Credentials</a></li></ul>
+                
+                <h4>
+                    Contact</h4>
+                <div>
+                    <img src="/images/layout/ftlogo.png" alt="" class="logo">
+                    <ul><li>
+                                <a href="https://www.edustaff.org/contact.aspx" target="_blank">Contact Us</a>
+                            </li><li>
+                                <b>P: </b>877.97.GOEDU (46338)
+                            </li><li>
+                                <b>F: </b>877.974.6339
+                            </li><li><a href="mailto:contact@edustaff.org">contact@edustaff.org</a></li></ul>
+                    <div class="clear">
+                        .</div>
+                </div>
+            </div>
+            <div class="content">
+                
+    
+<div class="pgHead">
+    <span id="BodyCH_ctl00_lblPageTitle" class="b">Manager</span>
+</div>
+<br />
+    <div id="defwrap" style="margin-top: 75px;">
+        <table class="defwraptbl">
+            <tr>
+                <td colspan="5">
+                    Login with your credentials below.
+                    <table style="width: 50%; margin: 30px auto;">
+                        <tr>
+                            <td style="width: 100%; text-align: left;">
+                                Username<br />
+                                <input name="ctl00$BodyCH$tbUNLogin" type="text" id="BodyCH_tbUNLogin" style="width: 100%;" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 100%; text-align: left;">
+                                Password<br />
+                                <input name="ctl00$BodyCH$tbPWLogin" type="password" id="BodyCH_tbPWLogin" style="width: 100%;" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">
+                                
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">
+                                <div class="btnP">
+                                    <a class="btn" id="btnLogin">Login</a>
+                                    <input type="submit" name="ctl00$BodyCH$btnLoginReal" value="" id="BodyCH_btnLoginReal" disabled="disabled" class="aspNetDisabled hidden" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="forgot" style="text-align: center;">
+                                <a href="/forgot.aspx">Forgot Password?</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="errLoginStatus hidden tcent">
+                                    <img src="/Images/icons/ajax-loader.gif" alt="Loading.." /><br />
+                                    Validating Credentials...
+                                </div>
+                                <div id="errDivLogin" class="tcent" style="color: Red;">
+                                    <span id="BodyCH_errLogin"></span>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div style="display: none;">
+        <input name="ctl00$BodyCH$tbIP" type="text" id="BodyCH_tbIP" />
+    </div>
+
+            </div>
+            <div id="footer" class="clear">
+                &copy;
+                2015
+                EDUStaff, LLC - All Rights Reserved
+            </div>
+        </div>
+        <div class="postlog" style="position: absolute; top: 10px; right: 10px; width: 275px; background-color: White; border: 2px solid #c0c0c0;
+            padding: 5px; display: none;" id="usermaskDiv">
+            Currently logged in as:
+            <span id="lblUMCurr"></span><br />
+            <br />
+            <div style="text-align: center;">
+                <b>Log in as:</b>
+                <select name="ctl00$ddlUsersUM" id="ddlUsersUM">
+
+</select>
+                <a onclick="loginasUM()" style="color: #68829e">&nbsp;&nbsp;Login</a><br />
+                <a onclick="returnUM()" style="color: #68829e;">Return as
+                    <span id="lblUMOrig"></span></a>
+            </div>
+        </div>
+        <div id="recents" class="recClear">
+            <div style="text-align: right">
+                <a style="color: #68829e;" onclick="closeRecents()">X</a></div>
+            
+        </div>
+        <div id="timetrackerDiv" class="EDUOnly hidden">
+            <div style="text-align: right; padding: 3px; font-weight: bold;">
+                <a onclick="closeETTPIO()">Close</a></div>
+            <div class="loginHead">
+                Punch In/Out</div>
+            <div id="timetracker" style="padding: 10px;">
+            </div>
+        </div>
+        <div class="hidden">
+            <input type="submit" name="ctl00$btnLogOutMain" value="" id="btnLogOutMain" disabled="disabled" class="aspNetDisabled" />
+            <input type="submit" name="ctl00$btnUM" value="" id="btnUM" disabled="disabled" class="aspNetDisabled" />
+            <input type="submit" name="ctl00$btnUMend" value="" id="btnUMend" disabled="disabled" class="aspNetDisabled" />
+        </div>
+        <div id="req" class="hidden">
+            <input name="ctl00$tbIsEDU" type="text" id="tbIsEDU" />
+            <input name="ctl00$tbIsAdmin" type="text" id="tbIsAdmin" />
+            <input name="ctl00$tbIsHourly" type="text" id="tbIsHourly" />
+            <input name="ctl00$tbManageContacts" type="text" id="tbManageContacts" />
+            <input name="ctl00$tbProcessPayroll" type="text" id="tbProcessPayroll" />
+            <input name="ctl00$tbDistrictSetup" type="text" id="tbDistrictSetup" />
+            <input name="ctl00$tbManageAccounts" type="text" id="tbManageAccounts" />
+            <input name="ctl00$tbManageTimeTracker" type="text" id="tbManageTimeTracker" />
+            <input name="ctl00$tbManageNonAesop" type="text" id="tbManageNonAesop" />
+            <input name="ctl00$tbAesopImports" type="text" id="tbAesopImports" />
+            <input name="ctl00$tbOnlyManageSelfTT" type="text" id="tbOnlyManageSelfTT" />
+            <input name="ctl00$tbMask" type="text" id="tbMask" />
+            <input name="ctl00$tbMRC" type="text" id="tbMRC" />
+        </div>
+        </form>
+        <div id="afterLP">
+        </div>
+    </div>
+    <script type="text/javascript">
+        var lpClear;
+        $(document).ready(function () {
+            //            $('#search').css("border", "none");
+            //            setMinheight();
+            cleaner();
+            if ($("[id$='tbIsEDU']").val() == 'No' || $("[id$='tbIsEDU']").val() == '') {
+                $('#lp').show();
+            }
+            pload();
+            $(".title").css("background-color", "transparent");
+            $('a.nohover').hover(function () { $(this).css('color', '#383838').css("cursor", "default"); });
+            fixLine(0);
+            var sPath = window.location.pathname.toLowerCase();
+            var sPage = sPath.substring(sPath.lastIndexOf('/') + 1);
+            if (sPath != '/default.aspx' && sPage != 'forgot.aspx' && sPage != 'loggedout.aspx' && sPage != 'sessionclose.aspx' && sPage != 'errorpage.aspx' && sPath != '/' && $("[id$='tbIsEDU']").val() == 'Yes' && IsHourly) {
+                setupETTPIO();
+            }
+            if ($("[id$='tbMask']").val() == "Yes" || $("[id$='tbIsEDU']").val() == 'Yes') {
+                if ($("[id$='tbMask']").val() == "Yes") {
+                    $("#usermaskDiv").show();
+                }
+            }
+            else {
+                $("#usermaskDiv").remove();
+            }
+            $(document).scroll(function () {
+                var t = parseFloat($(window).scrollTop()) + 10;
+                $("#usermaskDiv").css("top", t + "px");
+            });
+
+        });
+        function lpRemove() {
+            var zlp = 0;
+            $("[id^='lpChatBtnTbl']").find('tr').each(function () {
+                $(this).find('td:first').remove();
+                zlp = zlp + 1;
+                clearInterval(lpClear);
+            });
+        }
+        function pload() {
+            curLinkSel();
+            $('#linktable a').hover(function () {
+                var pos = $(this).position();
+                var t = pos.top;
+                var l = pos.left;
+                t = t + 1;
+                l = l - 28;
+                $(this).after('<div class="hov" style="top:' + t + 'px;left:' + l + 'px;"></div>');
+            }, function () {
+                $(".hov").remove();
+            });
+
+        }
+        function fixLine(c) {
+            if (c == 0) {
+                var tblH = $("#linktable").height() - $("#lastRow").height();
+                var bodH = $("#body").height();
+                var eH = parseFloat(bodH) - parseFloat(tblH);
+                eH = eH - 2;
+                $("#lastRow").height(eH);
+                $("#ftlogo").css("height", $("#lastRow").height() + "px");
+            }
+            else {
+                $("#fillerBuff, #lastTD").remove();
+                var sPath = window.location.pathname;
+                var sPage = sPath.substring(sPath.lastIndexOf('/') + 1);
+                if (sPath != '/default.aspx' /*&& sPage != ''*/) {
+                    $("#lastRow").after('<tr id="fillerBuff"><td class="lb1head">&nbsp;</td><td class="lb2head"></td></tr>');
+                }
+                var tblH = $("#linktable").height();
+                var bodH = $("#body").height();
+                var eH = parseFloat(bodH) - parseFloat(tblH);
+                if (sPath != '/default.aspx' /*&& sPage != ''*/) {
+                    $("#fillerBuff").after('<tr id="lastTD" style="height:' + eH + 'px;"><td class="lb1"></td><td class="lb2"></td></tr>');
+                }
+                else {
+                    var tblH = $("#linktable").height();
+                    var bodH = $("#body").height();
+                    var eh = parseFloat(bodH) - parseFloat(tblH);
+                    var curh = $("#linktable tr:last").height();
+                    $("#lastRow").css("height", curh + eh + "px");
+                }
+                $("#ftlogo").css("height", $("#lastRow").height() + "px");
+            }
+        }
+        function curLinkSel() {
+            var sPath = window.location.pathname;
+            var sPage = sPath.substring(sPath.lastIndexOf('/') + 1);
+            $('#linktable a').each(function () {
+                var curhref;
+                try {
+                    curhref = $(this).attr('href');
+                    if ((curhref.startsWith(sPage) && sPage != '') || ($(this).html() == 'Main' && sPage == '/search.aspx')) {
+                        var pos = $(this).position();
+                        var t = pos.top;
+                        var l = pos.left;
+                        t = t + 1;
+                        l = l - 28;
+                        $(this).after('<div class="curr" style="top:' + t + 'px;left:' + l + 'px;"></div>');
+                    }
+                    if ($(this).attr('href').startsWith('/default.aspx') && sPage == '') {
+                        var pos = $(this).position();
+                        var t = pos.top;
+                        var l = pos.left;
+                        t = t + 1;
+                        l = l - 28;
+                        $(this).after('<div class="curr" style="top:' + t + 'px;left:' + l + 'px;"></div>');
+                    }
+                }
+                catch (err) {
+                    curhref = "#";
+                }
+            });
+        }
+        String.prototype.startsWith = function (str) {
+            return this.indexOf(str) == 0;
+        };
+        String.prototype.contains = function (it) { return this.indexOf(it) != -1; };
+
+
+        function updateClock() {
+            if ($('#currtime').length) {
+                $.post("/getpost/getcurrtime.aspx", { key: 33454 }, function (content) {
+                    $("#currtime").html(content);
+                });
+            }
+            else {
+
+            }
+        }
+
+        $('#search').keydown(function (event) {
+            if (event.keyCode == 13 || event.which == 13) {
+                topsearch(event);
+            }
+        });
+        $('#srchimg').click(function (event) {
+            topsearch(event);
+        });
+        $('.padtd input[type=text], .padtd, .padtd textarea').css('width', '100%');
+        $('.padtd select').css('width', '102%');
+        function topsearch(event) {
+            event.preventDefault()
+            var sPath = window.location.pathname;
+            var sPage = sPath.substring(sPath.lastIndexOf('/') + 1);
+            if (sPage == "/manager/einfo.aspx") {
+                closeFile();
+            }
+            if ($('#search').val() != '') {
+                if ($('#search').val().length < 3) {
+                    $.fancybox("Search Parameter can not be less than 3 characters.");
+                    return false;
+                }
+                else {
+                    window.location = "/search.aspx?param=" + $('#search').val();
+                }
+            }
+            else {
+                $('#search').focus();
+            }
+        }
+        function setMinheight() {
+            var h = parseInt($('#header').height());
+            var f = parseInt($('#footer').height());
+            var c = parseInt($('#copyright').height());
+            var d = parseInt($(document).height());
+            var p = 31;
+            var r = d - f - h - c - p;
+            $('#body').css('min-height', r + 'px');
+        }
+        function closeRecents() {
+            $("#recents").hide();
+        }
+        function showRecents() {
+            $("#recents").show();
+        }
+        function callerID() {
+            clearTimeout(callidtimeout);
+            $.post("/manager/getpost/getcallerid.aspx", { key: 64354 }, function (content) {
+                var contentend = content.split("~");
+                if (contentend[0] == "1") {
+                    $("#callerid").show('slow').html(contentend[1]).css("top", ($(window).scrollTop()) + "px");
+                }
+                else if (contentend[0] == "0") {
+                    $('#callerid').hide('slow');
+                }
+                //callidtimeout = setTimeout("callerID()", 1000);
+            });
+        }
+        var callidtimeout;
+        function cleaner() {
+            if ($("[id$='tbIsEDU']").val() != 'Yes') {
+                $('.EDUOnly, .edit').remove();
+                $('.DISTOnly').show();
+                $('.EDUOnlyKeep').hide();
+            }
+            else {
+                $('.DISTOnly').remove();
+                $('.distedit').remove();
+                //callidtimeout = setTimeout("callerID()", 1000);
+            }
+            if ($("[id$='tbDistrictSetup']").val() != 'Yes') {
+                // $('.DistrictSetup').remove();
+            }
+            if ($("[id$='tbManageContacts']").val() != 'Yes') {
+                $('.ManageContacts').remove();
+            }
+            if ($("[id$='tbProcessPayroll']").val() != 'Yes') {
+                $('.ProcessPayroll').remove();
+            }
+            if ($("[id$='tbManageAccounts']").val() != 'Yes') {
+                $('.ManageAccounts').remove();
+            }
+            if ($("[id$='tbManageTimeTracker']").val() != 'Yes') {
+                $('.ManageTimeTracker').remove();
+            }
+            if ($("[id$='tbManageNonAesop']").val() != 'Yes') {
+                $('.ManageNonAesop').remove();
+            }
+            if ($("[id$='tbAesopImports']").val() != 'Yes') {
+                $('.ManageAesop').remove();
+            }
+            if ($("[id$='tbOnlyManageSelfTT']").val() == 'Yes') {
+                $('.OnlyManageSelfTT').remove();
+            }
+            if ($("[id$='tbMRC']").val() != 'Yes') {
+                $('.MRC').remove();
+            }
+            var sPath = window.location.pathname.toLowerCase();
+            var sPage = sPath.substring(sPath.lastIndexOf('/') + 1);
+            if (sPath == '/default.aspx' || sPage == 'forgot.aspx' || sPage == 'loggedout.aspx' || sPage == 'sessionclose.aspx' || sPage == 'errorpage.aspx' || sPath == '/') {
+                $('#searchwrap, #EDUManagerNav, .recClear, #timetracker').remove();
+                $(".postlog").remove();
+            }
+            else {
+                $(".prelog").remove();
+            }
+        }
+        function cfSearch() {
+            var eid = querySt("eid");
+            var uid = $("[id$='uidLbl']").val();
+            $.post("/getpost/clearlockfile.aspx?eid=" + eid + "&uid=" + uid, { key: 1588834 }, function (content) {
+                window.location = "/search.aspx";
+            });
+
+        }
+
+        function ETTPIO() {
+            updateClock();
+            $('#timetrackerDiv').show('slow');
+        }
+        function closeETTPIO() {
+            $('#timetrackerDiv').hide('slow');
+        }
+        function setupETTPIO() {
+            var pos = $("#ETTPIOLink").position();
+            var t = pos.top;
+            var l = pos.left;
+            t = t - 300;
+            //l = l - 298;
+            l = l + 100;
+            $("#timetrackerDiv").css("top", t + "px").css("left", l + "px");
+            //recents
+            var pos = $("#recentsLink").position();
+            var t = pos.top;
+            var l = pos.left;
+            t = t - 2;
+            //l = l - 298;
+            l = l + 200;
+            $("#recents").css("top", t + "px").css("left", l + "px");
+        }
+        function userMask() {
+            $("#usermaskDiv").show();
+        }
+        function loginasUM() {
+            valerrors = false;
+            checkDDL("ddlUsersUM", true, "");
+            if (!valerrors) {
+                $("[id$='btnUM']").attr("disabled", false).click();
+            }
+        }
+        function returnUM() {
+            $("[id$='btnUMend']").attr("disabled", false).click();
+        }
+
+    </script>
+    
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#searchwrap, #EDUManagerNav, .recClear, #timetracker').remove();
+            $('#btnLogin').click(function () {
+                validate();
+            });
+            $('input').keydown(function (e) {
+                if (e.keyCode == 13 || e.which == 13) {
+                    validate();
+                }
+            });
+        });
+        function validate() {
+            $('#btnLogin').hide();
+            valerrors = false;
+            checkTB('tbPWLogin', true, '', 'Password');
+            checkTB('tbUNLogin', true, '', 'User Name');
+            if (!valerrors) {
+                $('#errDivLogin').remove();
+                $('.errLoginStatus').show();
+                $("[id$='btnLoginReal']").attr("disabled", false).click();
+            }
+            else {
+                $('.ferr').focus();
+                $('#btnLogin').show();
+            }
+        }
+    </script>
+
+</body>
+</html>
