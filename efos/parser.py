@@ -16,9 +16,17 @@ from efos import log, get_handlers, EFOS_SIG
 
 class Barcode():
     def __init__(self, encoding, data):
+        """
+
+        :param encoding:
+        :paramType: String
+        :param data:
+        :paramType data: String
+        :return:
+        """
         self._efos_sig = None
         self._is_efos = False
-        self.type = encoding  # QRCODE
+        self.type = encoding  #: QRCODE
         self.raw = data
         self.raw_data = data
         self._data = data
@@ -34,15 +42,21 @@ class Barcode():
 
     @property
     def efos_sig(self):
+        """
+
+        :return: The efos sig found
+        """
         if self.is_efos:
             return self._efos_sig
         return None
 
     @property
     def is_efos(self):
+        """ """
         return self._is_efos
 
     def _parse_data(self):
+        """ """
         try:
             self._efos_sig = re.match(EFOS_SIG, self.raw_data).group()  # find the efos sig
             self.raw_data = self.raw_data.replace(self._efos_sig, "")
@@ -55,24 +69,29 @@ class Barcode():
         log.debug('regex not found: %s' % self.raw_data)
 
     def _parse_efos_data(self):
+        """ """
         self.cover_page = True if re.match("efos\d#[mnr]*[c][mnr]*#", self.efos_sig) else False
         self.merge = True if re.match("efos\d#[cnr]*[m][cnr]*#", self.efos_sig) else False
         self.new_page = True if re.match("efos\d#[mr]*[cn][mr]*#", self.efos_sig) else False
         self.remove_page = True if re.match("efos\d#[mn]*[cr][mn]*#", self.efos_sig) else False
 
     def _parse_qs_data(self):
+        """ """
         self._data = urlparse.parse_qs(self.raw_data)
         for key, value in self._data.iteritems():
             self._data[key] = value[0]
 
     def push(self, barcode):
+        """ """
         self._child_list.append(barcode)
 
     def pop(self):
+        """ """
         return self._child_list.pop()
 
     @property
     def data(self):
+        """ """
         ret_data = dict(self._data)
         for child in self._child_list:
             ret_data.update(child.data)
@@ -80,7 +99,9 @@ class Barcode():
 
 
 class Page():
+    """ """
     def __init__(self, page=None):
+        """ """
         self._barcodes = None
         self._efos_barcode = None
         self.page = page
@@ -105,6 +126,7 @@ class Page():
         self.get_barcodes()
 
     def get_barcodes(self):
+        """ """
         img = self.pil_image.convert('L')
 
         width, height = img.size
@@ -148,6 +170,7 @@ class Page():
         return None
 
     def get_ascii(self, ):
+        """ """
         # resize to: the max of the img is maxLen
         img = self.pil_image.copy()
 
@@ -194,6 +217,7 @@ class Page():
 
 
 class File():
+    """ """
     def __init__(self, barcode, filename_format=None):
         self._filename_format = filename_format
         self.barcode = barcode
@@ -203,13 +227,16 @@ class File():
 
     @property
     def page_count(self):
+        """ """
         return len(self.pages)
 
     @property
     def basename(self):
+        """ """
         return os.path.basename(self.get_filename())
 
     def get_filename(self):
+        """ """
         if self._filename:
             return self._filename
 
@@ -223,9 +250,11 @@ class File():
         return self._filename
 
     def add(self, page):
+        """ """
         self.pages.append(page)
 
     def write(self, output):
+        """ """
         pdf_file_writer = PdfFileWriter()
         for page in self.pages:
             pdf_file_writer.addPage(page.page)
@@ -233,7 +262,9 @@ class File():
 
 
 class Parser():
+    """ """
     def __init__(self, filename=None, options=None):
+        """ """
         if not options:
             log.critical('No options passed to Parser')
             raise ValueError('No Options')
@@ -256,9 +287,11 @@ class Parser():
 
     @property
     def file_count(self):
+        """ """
         return len(self.files)
 
     def parse(self):
+        """ """
         new_file = None
         for pdf_page in self.pdf_file.pages:
             page = Page(page=pdf_page)
@@ -271,6 +304,7 @@ class Parser():
                 log.debug("Adding page to %s" % new_file.get_filename())
 
     def process(self):
+        """ """
         if len(self.files) == 0:
             log.warning("No efos files found")
 
@@ -281,6 +315,7 @@ class Parser():
         self.archive_delete()
 
     def archive_delete(self):
+        """ """
         # After Parsing, Archive and Delete
         if self.options.archive:
             archive_filename = os.path.join(self.options.archive, self.filename.replace(self.options.watch, "")[1:])
@@ -297,9 +332,11 @@ class Parser():
                 log.info("Removing file %s" % (self.filename,))
 
     def new_file(self, barcode):
+        """ """
         file = File(barcode, filename_format=self.get_filename_format())
         self.files.append(file)
         return file
 
     def get_filename_format(self):
+        """ """
         return os.path.normpath(os.path.join(self.options.output, self.options.file_format))

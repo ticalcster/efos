@@ -1,11 +1,15 @@
 CherryPy==3.8.0
 ConfigArgParse==0.9.3
 Jinja2==2.8
+MarkupSafe==0.23
 Pillow==2.9.0
 PyPDF2==1.25.1
 pypng==0.0.18
 PyQRCode==1.1
-Wand==0.4.1
 requests==2.2.1
+sphinx-autobuild==0.5.2
+sphinx-rtd-theme==0.1.9
+Wand==0.4.1
+watchdog==0.8.3
 ws4py==0.3.4
 zbar

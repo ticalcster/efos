@@ -77,5 +77,6 @@ Vagrant.configure(2) do |config|
     sudo pip install watchdog
     sudo pip install Pillow==2.9.0
     sudo pip install Wand==0.4.1
+    sudo pip install -r /vagrant/requirements.txt
   SHELL
 end

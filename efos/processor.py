@@ -15,10 +15,12 @@ log = logging.getLogger('efos')
 
 class EfosObserver(Observer):
     def on_thread_start(self):
+        """ """
         log.info("Starting observer")
         super(EfosObserver, self).on_thread_start()
 
     def on_thread_stop(self):
+        """ """
         log.info("Stopping observer")
         super(EfosObserver, self).on_thread_stop()
 
@@ -27,6 +29,7 @@ class ProcessEventHandler(PatternMatchingEventHandler):
     patterns = ('*pdf',)
 
     def __init__(self, options=None, **kwargs):
+        """ """
         super(ProcessEventHandler, self).__init__(**kwargs)
         if not options:
             log.critical('No options passed to EventHandler')
@@ -34,6 +37,7 @@ class ProcessEventHandler(PatternMatchingEventHandler):
         self.options = options
 
     def on_created(self, event):
+        """ """
         super(ProcessEventHandler, self).on_created(event)
         time.sleep(1)  # TODO: remove
         log.info(event.src_path)
@@ -52,6 +56,7 @@ class ProcessEventHandler(PatternMatchingEventHandler):
 
 class Processor():
     def __init__(self, options=None):
+        """ """
         if not options:
             log.critical('No options passed to Processor')
             raise ValueError('No Options')
@@ -72,6 +77,7 @@ class Processor():
             os.makedirs(self.options.output)
 
     def run(self):
+        """ """
         log.info("Processor watching %s." % self.options.watch)
         log.info("Output directory: %s" % self.options.output)
         log.info("Archive directory: %s" % self.options.archive)
