@@ -2,8 +2,12 @@ import unittest
 import os
 import StringIO
 import shutil
+import logging
 
 import cherrypy
+
+
+logging.disable(logging.CRITICAL)
 
 WATCH_FOLDER = os.path.join(os.path.dirname(__file__), 'scans')  #: Tests watch directory
 ARCHIVE_FOLDER = os.path.join(WATCH_FOLDER, 'archive')  #: Tests archive folder
@@ -41,7 +45,7 @@ class Options:
         # FileHanlder
         self.disable_output = False
         # HttpHandler
-        self.form_data = ['user=foo', 'pass=bar']
+        self.form_data = ['token=foobar', ]
 
         for key, value in kwargs.iteritems():
             setattr(self, key, value)
