@@ -16,13 +16,6 @@ from efos.tests import Options, delete_file, copy_file, ARCHIVE_FOLDER, OUTPUT_F
 class TestFileHanlder(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cherrypy.config.update({
-            'server.socket_host': '0.0.0.0',
-            'server.socket_port': 9000
-        })
-
-        cherrypy.tree.mount(FileUploadTest(), '/', config={'/': {'tools.response_headers.on': True}})
-        cherrypy.engine.signals.subscribe()
         cherrypy.engine.start()
 
     @classmethod
@@ -42,8 +35,18 @@ class TestFileHanlder(unittest.TestCase):
         self.assertDictEqual(form_data, {'token': 'foobar', 'eid': '600144'})
 
     def test_http_call(self):
-        r = requests.get('http://localhost:9000/')
+        handler = HttpHandler(self.options)
+        file = File(self.barcode, filename_format="%(eid)s.pdf")
+        form_data = handler.get_form_data(file)
+
+        f = StringIO.StringIO()
+        file.write(f)
+        files = {'scanfile': (file.get_filename(), f)}
+
+        r = requests.post('http://localhost:9000/', files=files)
+        print(r.text)
         self.assertEquals(r.status_code, 200)
+        self.assertIn('foobar', r.text)
 
 
 class TestHttpHanlder(unittest.TestCase):

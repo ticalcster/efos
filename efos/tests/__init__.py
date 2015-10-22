@@ -67,9 +67,10 @@ class FileUploadTest(object):
         """
 
     @cherrypy.expose
-    def upload(self, myFile):
+    def upload(self, scanfile, eid):
         out = """<html>
         <body>
+            eid: %s<br />
             myFile length: %s<br />
             myFile filename: %s<br />
             myFile mime-type: %s
@@ -82,9 +83,18 @@ class FileUploadTest(object):
         # myFile.file.read reads from that.
         size = 0
         while True:
-            data = myFile.file.read(8192)
+            data = scanfile.file.read(8192)
             if not data:
                 break
             size += len(data)
 
-        return out % (size, myFile.filename, myFile.content_type)
+        return out % (size, eid, scanfile.filename, scanfile.content_type)
+
+
+cherrypy.config.update({
+    'server.socket_host': '0.0.0.0',
+    'server.socket_port': 9000
+})
+
+cherrypy.tree.mount(FileUploadTest(), '/', config={'/': {'tools.response_headers.on': True}})
+cherrypy.engine.signals.subscribe()
