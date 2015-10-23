@@ -121,10 +121,10 @@ class TestFileMethods(unittest.TestCase):
         new_file = File(self.barcode, self.options.file_format)
         new_file.add(Page(self.pdf_file.getPage(0)))
         new_file.add(Page(self.pdf_file.getPage(1)))
-        new_file.write(self.save_as)
+        new_file.write(f)
         self.assertEqual(os.path.isfile(self.save_as), True)
 
-    def test_file_write(self):
+    def test_file_write_stream(self):
         stream = StringIO.StringIO()
         new_file = File(self.barcode, self.options.file_format)
         new_file.add(Page(self.pdf_file.getPage(0)))

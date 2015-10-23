@@ -67,7 +67,7 @@ class FileUploadTest(object):
         """
 
     @cherrypy.expose
-    def upload(self, scanfile, eid):
+    def upload(self, token, eid, typeid, file):
         out = """<html>
         <body>
             eid: %s<br />
@@ -83,12 +83,12 @@ class FileUploadTest(object):
         # myFile.file.read reads from that.
         size = 0
         while True:
-            data = scanfile.file.read(8192)
+            data = file.file.read(8192)
             if not data:
                 break
             size += len(data)
 
-        return out % (size, eid, scanfile.filename, scanfile.content_type)
+        return out % (eid, size, file.filename, file.content_type)
 
 
 cherrypy.config.update({

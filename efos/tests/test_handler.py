@@ -26,6 +26,9 @@ class TestFileHanlder(unittest.TestCase):
         self.options = Options()
         self.barcode = Barcode('QRCODE', 'efos1#c#eid=600144')
 
+        self.filename = os.path.join(WATCH_FOLDER, 'doc_multi.pdf')
+        self.pdf_file = PdfFileReader(self.filename, strict=False)
+
     def test_http_form_data(self):
         handler = HttpHandler(self.options)
         file = File(self.barcode, filename_format="%(eid)s.pdf")
@@ -35,18 +38,24 @@ class TestFileHanlder(unittest.TestCase):
         self.assertDictEqual(form_data, {'token': 'foobar', 'eid': '600144'})
 
     def test_http_call(self):
-        handler = HttpHandler(self.options)
+        handler = HttpHandler(Options(form_data=['token=7ff1e8749c107ff1e8749c107ff1e8749c10',
+                                                 'typeid=29']))
         file = File(self.barcode, filename_format="%(eid)s.pdf")
         form_data = handler.get_form_data(file)
+        file.add(Page(self.pdf_file.getPage(0)))
+        file.add(Page(self.pdf_file.getPage(1)))
 
         f = StringIO.StringIO()
         file.write(f)
-        files = {'scanfile': (file.get_filename(), f)}
+        files = {'file': (file.get_filename(), f.getvalue(), 'application/pdf', {})}
 
-        r = requests.post('http://localhost:9000/', files=files)
-        print(r.text)
+        # url = 'https://devmanager.edustaff.org/manager/einfo/getpost/auto_file_upload.aspx'
+        url = 'http://localhost:9000/upload'
+        r = requests.post(url,
+                          data=form_data,
+                          files=files)
         self.assertEquals(r.status_code, 200)
-        self.assertIn('foobar', r.text)
+        self.assertIn('eid: 600144', r.text)
 
 
 class TestHttpHanlder(unittest.TestCase):
