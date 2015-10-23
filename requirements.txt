@@ -9,6 +9,7 @@ PyQRCode==1.1
 requests==2.2.1
 sphinx-autobuild==0.5.2
 sphinx-rtd-theme==0.1.9
+pathtools==0.1.2
 Wand==0.4.1
 watchdog==0.8.3
 ws4py==0.3.4
