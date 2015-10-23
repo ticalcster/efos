@@ -141,8 +141,6 @@ def get_options():
 
     options = cap.parse_args()
 
-    print("-------", options.form_data)
-
     # TODO: add custom help to show help from handlers.
 
 

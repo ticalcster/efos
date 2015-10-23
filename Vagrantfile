@@ -69,6 +69,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: <<-SHELL
     sudo apt-get update
     sudo apt-get install -y python-dev libjpeg-dev libfreetype6-dev zlib1g-dev
+    sudo apt-get install -y libmagickwand-dev
     sudo apt-get install -y python-pip
     sudo apt-get install -y python-wand
     sudo apt-get install -y python-pil
