@@ -32,7 +32,7 @@ Vagrant.configure(2) do |config|
   # Bridged networks make the machine appear as another physical device on
   # your network.
   # config.vm.network "public_network"
-  config.vm.network :forwarded_port, guest: 8081, host: 8081  # redis
+  config.vm.network :forwarded_port, guest: 8081, host: 8081  # web
   config.vm.network :private_network, ip: "172.30.30.11", virtualbox__intnet: true
 
   # Share an additional folder to the guest VM. The first argument is

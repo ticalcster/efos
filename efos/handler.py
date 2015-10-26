@@ -72,13 +72,13 @@ class HttpHandler(EfosHandler):
                     log.warning("Server responded with status code %s [%s]" % (r.status_code, r.text))
 
             except IOError as ex:
-                log.error("%(type)s: %(msg)s" % {'type': type(ex).__name__, 'msg': ex.strerror, 'args': ex.args})
+                log.error("%(type)s: %(msg)s" % {'type': type(ex).__name__, 'msg': ex.message, 'args': ex.args})
             except requests.exceptions.ConnectionError as ex:
                 log.error("Could not contact server")
             except requests.exceptions.Timeout as ex:
                 log.error("Request timed out")
             except Exception as ex:
-                log.error("%(type)s: %(msg)s" % {'type': type(ex).__name__, 'msg': ex.strerror, 'args': ex.args})
+                log.error("%(type)s: %(msg)s" % {'type': type(ex).__name__, 'msg': ex.message, 'args': ex.args})
 
 
 class FileHandler(EfosHandler):
