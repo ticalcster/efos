@@ -66,7 +66,6 @@ class HttpHandler(EfosHandler):
                 file.write(f)
                 files = {'file': (os.path.basename(file.get_filename()), f.getvalue(), 'application/pdf', {})}
                 log.debug(self.get_form_data(file))
-                log.debug(files['file'][0])
                 r = requests.post(self.options.url, data=self.get_form_data(file), files=files)
 
                 if r.status_code == 200:
