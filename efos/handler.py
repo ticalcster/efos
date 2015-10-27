@@ -49,10 +49,11 @@ class HttpHandler(EfosHandler):
         :return:
         """
         form_data = {}
-        for option in self.options.form_data:
-            # TODO: need to catch an error here on the split
-            key, value = option.split('=')[:2]  # the args for options are and array of key=value strings
-            form_data.update({key: value})
+        if self.options.form_data:
+            for option in self.options.form_data:
+                # TODO: need to catch an error here on the split
+                key, value = option.split('=')[:2]  # the args for options are and array of key=value strings
+                form_data.update({key: value})
         form_data.update(file.barcode.data)  # merge the barcode data
         return form_data
 
@@ -63,9 +64,8 @@ class HttpHandler(EfosHandler):
                 f = StringIO.StringIO()
                 file.write(f)
                 files = {self.options.file_form_name: (file.get_filename(), f.getvalue(), 'application/pdf', {})}
-                r = requests.post(self.options.url, data=self.get_form_data(file), files=files,
-                                  timeout=self.options.http_timeout)
-
+                r = requests.post(self.options.url, data=self.get_form_data(file), files=files)
+                
                 if r.status_code == 200:
                     log.info("file uploaded!")
                 else:
@@ -103,5 +103,6 @@ class FileHandler(EfosHandler):
         try:
             f = open(file.get_filename(), 'wb')
             file.write(f)
+            f.close()
         except IOError as ex:
             log.error("%(type)s: %(msg)s" % {'type': type(ex).__name__, 'msg': ex.strerror, 'args': ex.args})
