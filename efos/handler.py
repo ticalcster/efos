@@ -1,6 +1,7 @@
 import StringIO
 import os
 import requests
+from collections import OrderedDict
 
 from efos import log
 
@@ -55,7 +56,7 @@ class HttpHandler(EfosHandler):
                 key, value = option.split('=')[:2]  # the args for options are and array of key=value strings
                 form_data.update({key: value})
         form_data.update(file.barcode.data)  # merge the barcode data
-        return form_data
+        return dict(OrderedDict((form_data.iteritems())))
 
     def process(self, file):
         if self.options.url:
@@ -65,7 +66,7 @@ class HttpHandler(EfosHandler):
                 file.write(f)
                 files = {self.options.file_form_name: (file.get_filename(), f.getvalue(), 'application/pdf', {})}
                 r = requests.post(self.options.url, data=self.get_form_data(file), files=files)
-                
+
                 if r.status_code == 200:
                     log.info("file uploaded!")
                 else:
