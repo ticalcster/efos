@@ -257,6 +257,7 @@ class File():
         """ """
         pdf_file_writer = PdfFileWriter()
         for page in self.pages:
+            log.debug('Adding page to file for writing')
             pdf_file_writer.addPage(page.page)
         pdf_file_writer.write(output)
 
