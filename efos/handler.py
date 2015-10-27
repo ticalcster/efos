@@ -56,7 +56,7 @@ class HttpHandler(EfosHandler):
                 key, value = option.split('=')[:2]  # the args for options are and array of key=value strings
                 form_data.update({key: value})
         form_data.update(file.barcode.data)  # merge the barcode data
-        return dict(OrderedDict(sorted(form_data.iteritems())))
+        return OrderedDict(sorted(form_data.iteritems()))
 
     def process(self, file):
         if self.options.url:
