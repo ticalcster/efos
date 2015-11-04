@@ -39,7 +39,7 @@ class ProcessEventHandler(PatternMatchingEventHandler):
     def on_created(self, event):
         """ """
         super(ProcessEventHandler, self).on_created(event)
-        time.sleep(1)  # TODO: remove
+        time.sleep(5)  # TODO: remove
         log.info(event.src_path)
         filename = event.src_path
 
