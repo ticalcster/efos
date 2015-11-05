@@ -16,6 +16,23 @@ import sys
 import os
 import shlex
 
+# Mock zbar
+try:
+    from unittest.mock import MagicMock
+except:
+    from mock import MagicMock
+
+
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+            return Mock()
+
+MOCK_MODULES = ['zbar']
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
+
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
