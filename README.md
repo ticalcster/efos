@@ -1,1 +1,1 @@
-[ edustaff | employee ] filing & organizational system
+employee filing & organizational system
