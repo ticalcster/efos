@@ -14,7 +14,7 @@ import zbar
 from efos import log, get_handlers, EFOS_SIG
 
 
-class Barcode():
+class Barcode(object):
     def __init__(self, encoding, data):
         """
 
@@ -98,7 +98,7 @@ class Barcode():
         return ret_data
 
 
-class Page():
+class Page(object):
     """ """
     def __init__(self, page=None):
         """ """
@@ -216,7 +216,7 @@ class Page():
         return ascii.getvalue()
 
 
-class File():
+class File(object):
     """ """
     def __init__(self, barcode, filename_format=None):
         self._filename_format = filename_format
@@ -262,7 +262,7 @@ class File():
         pdf_file_writer.write(output)
 
 
-class Parser():
+class Parser(object):
     """ """
     def __init__(self, filename=None, options=None):
         """ """
@@ -285,6 +285,7 @@ class Parser():
                 self.pdf_file = PdfFileReader(self.filename, strict=False)
         except IOError as ex:
             print "I/O error({0}): {1}".format(ex.errno, ex.strerror)
+            raise ex
 
     @property
     def file_count(self):

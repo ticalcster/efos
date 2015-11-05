@@ -127,6 +127,8 @@ def get_options():
     cap.add_argument('-a', '--archive', default="archive", help='directory to archive files')
     cap.add_argument('-c', '--config', is_config_file=True, help='path to config file')
     cap.add_argument('-d', '--delete', action="store_true", help='delete files after processing')
+    cap.add_argument('--delay', default=0, type=int,
+                     help='added a delay between getting notified and processing the file')
     cap.add_argument('-f', '--file-format', default="%(filename)s", help='filename format from kwargs in QRCode')
     cap.add_argument('--handlers', nargs='+', default=['efos.handler.FileHandler', 'efos.handler.HttpHandler'],
                      help='handlers to use when processing parsed files')

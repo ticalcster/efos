@@ -43,10 +43,31 @@ class ProcessEventHandler(PatternMatchingEventHandler):
         log.info(event.src_path)
         filename = event.src_path
 
+        # timeout settings
+        if self.options.delay > 0:
+            time.sleep(self.options.delay)
+        else:
+            try_count = 0
+            while try_count < 10:
+                can_read = True
+                if not os.path.exists(filename):
+                    can_read = False
+                elif not os.path.isfile(filename):
+                    can_read = False
+                elif not os.access(filename, os.R_OK):
+                    can_read = False
+                if can_read:
+                    break
+                time.sleep(1)
+                try_count += 1
+            log.debug('waited for %s seconds' % try_count)
         # Parse the file
-        parser = Parser(filename=filename, options=self.options)
-        parser.parse()
-        parser.process()
+        try:
+            parser = Parser(filename=filename, options=self.options)
+            parser.parse()
+            parser.process()
+        except Exception as ex:
+            log.error("%s: Error: %s" % (filename, ex))
 
         # log.debug("source file: %s" % event.src_path)
         # log.debug("archive folder: %s" % self.options.archive)
