@@ -5,6 +5,8 @@ import importlib
 
 import configargparse
 
+__version__ = '0.1.1'
+
 __all__ = ('log', 'get_options', 'get_handlers')
 
 EFOS_SIG = '^efos\d#[cmnr]{0,4}#'
@@ -123,7 +125,8 @@ def get_handler_classes(options):
 
 def get_options():
     # Config / Arg stuffs
-    cap = configargparse.ArgParser(default_config_files=['efos.conf', ], allow_unknown_config_file_keys=True)
+    cap = configargparse.ArgParser(default_config_files=['efos.conf', ],
+                                   allow_unknown_config_file_keys=True)
     cap.add_argument('-a', '--archive', default="archive", help='directory to archive files')
     cap.add_argument('-c', '--config', is_config_file=True, help='path to config file')
     cap.add_argument('-d', '--delete', action="store_true", help='delete files after processing')
@@ -138,13 +141,11 @@ def get_options():
 
     options, nope = cap.parse_known_args()
 
+    # adds the options from each active handler
     for handler_class in get_handler_classes(options):
         handler_class.add_arguments(cap)
 
     options = cap.parse_args()
-
-    # TODO: add custom help to show help from handlers.
-
 
     # set logging level
     log = logging.getLogger('efos')
