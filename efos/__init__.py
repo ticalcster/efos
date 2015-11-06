@@ -106,6 +106,7 @@ log = logging.getLogger('efos')
 
 
 def get_handlers(options):
+    print(__name__, 'Getting Handlers')
     handlers = []
     for handler in get_handler_classes(options):
         handlers.append(handler(options))
@@ -133,13 +134,19 @@ def get_options():
     cap.add_argument('--delay', default=0, type=int,
                      help='added a delay between getting notified and processing the file')
     cap.add_argument('-f', '--file-format', default="%(filename)s", help='filename format from kwargs in QRCode')
+    #cap.add_argument('--handlers', action="append", default=[],
     cap.add_argument('--handlers', nargs='+', default=['efos.handler.FileHandler', 'efos.handler.HttpHandler'],
                      help='handlers to use when processing parsed files')
     cap.add_argument('-l', '--log-level', default=11, type=int, help='logging level [1-50+]')
     cap.add_argument('-p', '--port', default=8081, type=int, help='web server port')
     cap.add_argument('-w', '--watch', required=True, help='directory to watch for files')
 
+    #  nargs='+',
+    # 'efos.handler.FileHandler', 'efos.handler.HttpHandler'
+
     options, nope = cap.parse_known_args()
+
+    print('----', options.handlers)
 
     # adds the options from each active handler
     for handler_class in get_handler_classes(options):

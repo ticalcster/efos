@@ -271,9 +271,11 @@ class Parser(object):
             raise ValueError('No Options')
         self.options = options
         self.filename = filename
+        log.debug('saved: %s and %s' % (self.filename, self.options))
         self.files = []
+        log.debug('init file: %s' % self.files)
         self.handlers = get_handlers(self.options)
-
+        log.debug('init finished')
         try:
             if not os.path.exists(self.filename):
                 print "File path is invalid."
@@ -286,6 +288,8 @@ class Parser(object):
         except IOError as ex:
             print "I/O error({0}): {1}".format(ex.errno, ex.strerror)
             raise ex
+
+        print('&&&&', self.pdf_file)
 
     @property
     def file_count(self):

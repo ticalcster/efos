@@ -3,6 +3,9 @@ import os
 import requests
 from collections import OrderedDict
 
+import dropbox
+from dropbox.exceptions import AuthError, ApiError
+
 from efos import log
 
 
@@ -108,3 +111,47 @@ class FileHandler(EfosHandler):
             f.close()
         except IOError as ex:
             log.error("%(type)s: %(msg)s" % {'type': type(ex).__name__, 'msg': ex.strerror, 'args': ex.args})
+
+
+class DropboxHandler(EfosHandler):
+    # todo: not sure if this is how it should be handled, maybe put in init.
+    dropbox_access_token = None
+    dbx = None
+    dbx_user = None
+
+    def setup(self):
+        log.debug('Dropbox Setup')
+        log.debug('Dropbox token: %s' % self.options.dropbox_access_token)
+        self.dropbox_access_token = self.options.dropbox_access_token
+        self.dbx = dropbox.Dropbox(self.dropbox_access_token)
+        try:
+            self.dbx_user = self.dbx.users_get_current_account()
+            log.info(self.dbx_user.name.display_name)
+        except AuthError as ex:
+            log.warning('Dropbox Auth Error')
+
+        log.debug('Dropbox Setup')
+
+    @staticmethod
+    def add_arguments(cap):
+        cap.add_argument('--dropbox-access-token', default=None, help='Application access token')
+        cap.add_argument('--dropbox-path', help='File path in Dropbox account')
+
+    def process(self, file):
+        log.info('Uploading %(filename)s to Dropbox.' % {'filename': file.get_filename()})
+
+        try:
+            f = StringIO.StringIO()
+            file.write(f)
+            try:
+                f.seek(0)  # not sure why but dropbox would fail with out that, it shouldn't ne read at all.
+                meta_data = self.dbx.files_upload(f, file.get_filename())
+                log.info("File saved to Dropbox. REV: %s", meta_data.rev)
+            except ApiError as ex:
+                log.error(ex)
+
+        except IOError as ex:
+            log.error("%(type)s: %(msg)s" % {'type': type(ex).__name__, 'msg': ex.message, 'args': ex.args})
+        except Exception as ex:
+            log.error("%(type)s: %(msg)s" % {'type': type(ex).__name__, 'msg': ex.message, 'args': ex.args})
+            log.error(ex)

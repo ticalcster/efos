@@ -63,8 +63,11 @@ class ProcessEventHandler(PatternMatchingEventHandler):
             log.debug('waited for %s seconds' % try_count)
         # Parse the file
         try:
+            log.debug('Creating Parser() object for %s' % filename)
             parser = Parser(filename=filename, options=self.options)
+            log.debug('Starting to parse file')
             parser.parse()
+            log.debug('Processing parsed file')
             parser.process()
         except Exception as ex:
             log.error("%s: Error: %s" % (filename, ex))

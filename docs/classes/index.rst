@@ -1,6 +1,5 @@
-####
 Code
-####
+====
 
 .. toctree::
    :maxdepth: 1
