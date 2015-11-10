@@ -289,8 +289,6 @@ class Parser(object):
             print "I/O error({0}): {1}".format(ex.errno, ex.strerror)
             raise ex
 
-        print('&&&&', self.pdf_file)
-
     @property
     def file_count(self):
         """ """
@@ -318,21 +316,25 @@ class Parser(object):
             for handler in self.handlers:
                 handler.process(file)
 
-        self.archive_delete()
+        # self.archive_delete()
 
-    def archive_delete(self):
+    def archive(self):
+        for handler in self.handlers:
+            handler.archive(self.filename)
+
+    def delete(self):
         """ """
-        # After Parsing, Archive and Delete
-        if self.options.archive:
-            archive_filename = os.path.join(self.options.archive, self.filename.replace(self.options.watch, "")[1:])
-            if self.options.delete:
-                log.info("Archiving file %s to %s" % (self.filename, archive_filename))
-                log.info("Removing file %s" % (self.filename,))
-                os.rename(self.filename, archive_filename)
-            else:
-                log.info("Archiving file %s to %s" % (self.filename, archive_filename))
-                shutil.copy(self.filename, archive_filename)
-        elif self.options.delete:
+        # # After Parsing, Archive and Delete
+        # if self.options.archive:
+        #     archive_filename = os.path.join(self.options.archive, self.filename.replace(self.options.watch, "")[1:])
+        #     if self.options.delete:
+        #         log.info("Archiving file %s to %s" % (self.filename, archive_filename))
+        #         log.info("Removing file %s" % (self.filename,))
+        #         os.rename(self.filename, archive_filename)
+        #     else:
+        #         log.info("Archiving file %s to %s" % (self.filename, archive_filename))
+        #         shutil.copy(self.filename, archive_filename)
+        if self.options.delete:
             if os.path.exists(self.filename):
                 os.remove(self.filename)
                 log.info("Removing file %s" % (self.filename,))
@@ -345,4 +347,4 @@ class Parser(object):
 
     def get_filename_format(self):
         """ """
-        return os.path.normpath(os.path.join(self.options.output, self.options.file_format))
+        return os.path.normpath(self.options.file_format)

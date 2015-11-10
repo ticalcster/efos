@@ -24,23 +24,23 @@ class TestFileHanlder(unittest.TestCase):
 
     def setUp(self):
         self.options = Options()
-        self.barcode = Barcode('QRCODE', 'efos1#c#eid=600144')
+        self.barcode = Barcode('QRCODE', 'efos1#c#id=600144')
 
         self.filename = os.path.join(WATCH_FOLDER, 'doc_multi.pdf')
         self.pdf_file = PdfFileReader(self.filename, strict=False)
 
     def test_http_form_data(self):
         handler = HttpHandler(self.options)
-        file = File(self.barcode, filename_format="%(eid)s.pdf")
+        file = File(self.barcode, filename_format="%(id)s.pdf")
 
         form_data = handler.get_form_data(file)
 
-        self.assertDictEqual(form_data, {'token': 'foobar', 'eid': '600144'})
+        self.assertDictEqual(form_data, {'token': 'foobar', 'id': '600144'})
 
     def test_http_call(self):
         handler = HttpHandler(Options(form_data=['token=7ff1e8749c107ff1e8749c107ff1e8749c10',
                                                  'typeid=29']))
-        file = File(self.barcode, filename_format="%(eid)s.pdf")
+        file = File(self.barcode, filename_format="%(id)s.pdf")
         form_data = handler.get_form_data(file)
         file.add(Page(self.pdf_file.getPage(0)))
         file.add(Page(self.pdf_file.getPage(1)))
@@ -55,7 +55,7 @@ class TestFileHanlder(unittest.TestCase):
                           data=form_data,
                           files=files)
         self.assertEquals(r.status_code, 200)
-        self.assertIn('eid: 600144', r.text)
+        self.assertIn('id: 600144', r.text)
 
 
 class TestHttpHanlder(unittest.TestCase):
@@ -64,4 +64,4 @@ class TestHttpHanlder(unittest.TestCase):
         pdf_file = PdfFileReader(filename, strict=False)
         efos_page = Page(pdf_file.getPage(0))
         self.assertTrue(efos_page.is_efos)
-        self.assertEqual(efos_page.get_barcode().data.get('eid'), '600144')
+        self.assertEqual(efos_page.get_barcode().data.get('id'), '600000')

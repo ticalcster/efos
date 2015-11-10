@@ -69,6 +69,11 @@ class ProcessEventHandler(PatternMatchingEventHandler):
             parser.parse()
             log.debug('Processing parsed file')
             parser.process()
+            if self.options.archive:
+                log.debug('Arching parsed file')
+                parser.archive()
+
+            parser.delete()
         except Exception as ex:
             log.error("%s: Error: %s" % (filename, ex))
 
@@ -78,7 +83,7 @@ class ProcessEventHandler(PatternMatchingEventHandler):
         #     "archive file: %s" % os.path.join(self.options.archive, event.src_path.replace(self.options.archive, "")[1:]))
 
 
-class Processor():
+class Processor(object):
     def __init__(self, options=None):
         """ """
         if not options:
@@ -88,23 +93,23 @@ class Processor():
 
         log.info("Processor created.")
 
-        if not os.path.isdir(self.options.watch):
-            log.info("Creating watch directory %s.", self.options.watch)
-            os.makedirs(self.options.watch)
-
-        if self.options.archive and not os.path.isdir(self.options.archive):
-            log.info("Creating archive directory %s.", self.options.archive)
-            os.makedirs(self.options.archive)
-
-        if self.options.output and not os.path.isdir(self.options.output):
-            log.info("Creating output directory %s.", self.options.output)
-            os.makedirs(self.options.output)
+        # if not os.path.isdir(self.options.watch):
+        #     log.info("Creating watch directory %s.", self.options.watch)
+        #     os.makedirs(self.options.watch)
+        #
+        # if self.options.archive and not os.path.isdir(self.options.archive):
+        #     log.info("Creating archive directory %s.", self.options.archive)
+        #     os.makedirs(self.options.archive)
+        #
+        # if self.options.output and not os.path.isdir(self.options.output):
+        #     log.info("Creating output directory %s.", self.options.output)
+        #     os.makedirs(self.options.output)
 
     def run(self):
         """ """
         log.info("Processor watching %s." % self.options.watch)
-        log.info("Output directory: %s" % self.options.output)
-        log.info("Archive directory: %s" % self.options.archive)
+        log.info("Output directory: %s" % self.options.output_path)
+        log.info("Archive directory: %s" % self.options.archive_path)
 
         event_handler = ProcessEventHandler(options=self.options)
         observer = EfosObserver()

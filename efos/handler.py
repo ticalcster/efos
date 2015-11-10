@@ -2,6 +2,7 @@ import StringIO
 import os
 import requests
 import shelve
+import shutil
 from collections import OrderedDict
 
 import dropbox
@@ -35,7 +36,15 @@ class EfosHandler(object):
 
         :param file: :class:`efos.parser.File`
         """
-        log.warning('%s process not implemented' % self.__class__.__name__)
+        log.debug('%s process not implemented' % self.__class__.__name__)
+
+    def archive(self, src_filename):
+        """
+        Function run on the source pdf after parsing is complete.
+
+        :param src_filename: string
+        """
+        log.debug('%s archive not implemented' % self.__class__.__name__)
 
 
 class HttpHandler(EfosHandler):
@@ -93,14 +102,18 @@ class FileHandler(EfosHandler):
 
     @staticmethod
     def add_arguments(cap):
-        cap.add_argument('-o', '--output', default="output", help='directory to output files')
+        cap.add_argument('-o', '--output-path', default="output", help='directory to output files')
+        cap.add_argument('--archive-path', default="archive", help='directory to archive files')
         cap.add_argument('--disable-output', action="store_true", help="Will disable the FileHandler.")
 
     def setup(self):
         log.debug('%s Setup' % self.__class__.__name__)
-        if self.options.output:
-            if not os.path.isabs(self.options.output):
-                self.options.output = os.path.join(self.options.watch, self.options.output)
+
+        if not os.path.isabs(self.options.output_path):
+            self.options.output_path = os.path.join(self.options.watch, self.options.output_path)
+
+        if not os.path.isabs(self.options.archive_path):
+            self.options.archive_path = os.path.join(self.options.watch, self.options.archive_path)
 
     def process(self, file):
         if self.options.disable_output:
@@ -108,12 +121,20 @@ class FileHandler(EfosHandler):
             return
 
         log.info("Saving %(filename)s" % {'filename': file.get_filename()})
+        full_path = self.options.output_path % file.barcode.data
+        full_path = os.path.normpath(os.path.join(full_path, file.get_filename()))
         try:
-            f = open(file.get_filename(), 'wb')
+            f = open(full_path, 'wb')
             file.write(f)
             f.close()
         except IOError as ex:
             log.error("%(type)s: %(msg)s" % {'type': type(ex).__name__, 'msg': ex.strerror, 'args': ex.args})
+
+    def archive(self, src_file):
+        try:
+            shutil.copy(src_file, self.options.archive_path)
+        except Exception as ex:
+            log.error(ex)
 
 
 class DropboxHandler(EfosHandler):
@@ -129,7 +150,8 @@ class DropboxHandler(EfosHandler):
         cap.add_argument('--dbx-key', default=None, help='Dropbox Application key')
         cap.add_argument('--dbx-secret', default=None, help='Dropbox Application secret')
         cap.add_argument('--dbx-token', default=None, help='Application access token')
-        cap.add_argument('--dbx-path', help='File path in Dropbox account')
+        cap.add_argument('--dbx-path', default='/output', help='File path in Dropbox account')
+        cap.add_argument('--dbx-archive', default='/archive', help='File path in Dropbox account')
         cap.add_argument('--dbx-autorename', action='store_true', default=True, help='Rename file if it already exists')
         # todo: add some kind of encryption to the tokens
 
@@ -152,12 +174,12 @@ class DropboxHandler(EfosHandler):
 
         store = shelve.open('dbx.dat')
         if 'token' in store:
-            token = store['token']
+            token = store['token']  # Should we encrypt this? the source is open though
             store.close()
             return token
 
         token = self.generate_token()
-        store['token']
+        store['token'] = token
         store.close()
         return token
 
@@ -192,13 +214,30 @@ class DropboxHandler(EfosHandler):
         try:
             f = StringIO.StringIO()
             file.write(f)
+            f.seek(0)  # not sure why but dropbox would fail with out that, it shouldn't ne read at all.
+            upload_path = self.options.dbx_path % file.barcode.data
             try:
-                f.seek(0)  # not sure why but dropbox would fail with out that, it shouldn't ne read at all.
                 meta_data = self.dbx.files_upload(f, file.get_filename(), autorename=self.options.dbx_autorename)
                 log.info("File saved to Dropbox. REV: %s", meta_data.name)
             except ApiError as ex:
                 log.error(ex)
 
+        except IOError as ex:
+            log.error("%(type)s: %(msg)s" % {'type': type(ex).__name__, 'msg': ex.message, 'args': ex.args})
+        except Exception as ex:
+            log.error("%(type)s: %(msg)s" % {'type': type(ex).__name__, 'msg': ex.message, 'args': ex.args})
+            log.error(ex)
+
+    def archive(self, src_file):
+        log.info('Archiving  %(filename)s to Dropbox.' % {'filename': os.path.basename(src_file)})
+        try:
+            f = open(src_file, 'r')
+            filename = os.path.join(self.options.dbx_archive, os.path.basename(src_file))
+            try:
+                meta_data = self.dbx.files_upload(f, filename, autorename=self.options.dbx_autorename)
+            except ApiError as ex:
+                log.error(ex)
+            f.close()
         except IOError as ex:
             log.error("%(type)s: %(msg)s" % {'type': type(ex).__name__, 'msg': ex.message, 'args': ex.args})
         except Exception as ex:

@@ -36,11 +36,12 @@ class Options:
         :return:
         """
         self.watch = WATCH_FOLDER
-        self.archive = ARCHIVE_FOLDER
-        self.output = OUTPUT_FOLDER
+        self.archive_path = ARCHIVE_FOLDER
+        self.output_path = OUTPUT_FOLDER
+        self.archive = True
         self.delete = False
         self.log_level = 11
-        self.file_format = "%(eid)s.pdf"
+        self.file_format = "%(id)s.pdf"
         self.handlers = ['efos.handler.FileHandler']
         # FileHanlder
         self.disable_output = False
@@ -67,10 +68,10 @@ class FileUploadTest(object):
         """
 
     @cherrypy.expose
-    def upload(self, token, eid, typeid, file):
+    def upload(self, token, id, typeid, file):
         out = """<html>
         <body>
-            eid: %s<br />
+            id: %s<br />
             myFile length: %s<br />
             myFile filename: %s<br />
             myFile mime-type: %s
@@ -88,7 +89,7 @@ class FileUploadTest(object):
                 break
             size += len(data)
 
-        return out % (eid, size, file.filename, file.content_type)
+        return out % (id, size, file.filename, file.content_type)
 
 
 cherrypy.config.update({
