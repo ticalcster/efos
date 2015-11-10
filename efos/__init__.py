@@ -104,7 +104,6 @@ LOGGING_CONFIG = {
 logging.config.dictConfig(LOGGING_CONFIG)
 log = logging.getLogger('efos')
 
-
 def get_handlers(options):
     handlers = []
     for handler in get_handler_classes(options):
@@ -123,6 +122,9 @@ def get_handler_classes(options):
     return handler_classes
 
 
+DEFAULT_HANDLERS = ['efos.handler.FileHandler', 'efos.handler.HttpHandler']
+
+
 def get_options():
     # Config / Arg stuffs
     cap = configargparse.ArgParser(default_config_files=['efos.conf', ], allow_unknown_config_file_keys=True)
@@ -139,16 +141,22 @@ def get_options():
     cap.add_argument('-p', '--port', default=8081, type=int, help='web server port')
     cap.add_argument('-w', '--watch', required=True, help='directory to watch for files')
 
+    options, nope = cap.parse_known_args()
+
     #  nargs='+',
     # 'efos.handler.FileHandler', 'efos.handler.HttpHandler'
-
-    options, nope = cap.parse_known_args()
+    if len(options.handlers) == 0:
+        options.handlers = DEFAULT_HANDLERS
 
     # adds the options from each active handler
     for handler_class in get_handler_classes(options):
         handler_class.add_arguments(cap)
 
     options = cap.parse_args()
+
+    if len(options.handlers) == 0:
+        options.handlers = DEFAULT_HANDLERS
+
 
     # set logging level
     log = logging.getLogger('efos')
