@@ -228,7 +228,7 @@ class DropboxHandler(EfosHandler):
             file.write(f)
             f.seek(0)  # not sure why but dropbox would fail with out that, it shouldn't ne read at all.
             upload_path = self.options.dbx_path % file.barcode.data
-            upload_path = os.path.normpath(os.path.join(upload_path, file.get_filename()))
+            upload_path = os.path.normpath(os.path.join('/', upload_path, file.get_filename()))
             try:
                 meta_data = self.dbx.files_upload(f, upload_path, autorename=self.options.dbx_autorename)
                 log.info("File saved to Dropbox. REV: %s", meta_data.name)
