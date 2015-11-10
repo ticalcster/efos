@@ -36,8 +36,8 @@ That gives the scanner up to six seconds to copy the file to the folder.
 
 :Default: ``0``
 
-filename-format
-^^^^^^^^^^^^^^^
+file-format
+^^^^^^^^^^^
 This is how efos should name each parsed file. It uses pythons old % formatting with the barcode data.
 
 .. code-block:: python

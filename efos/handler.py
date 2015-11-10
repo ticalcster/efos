@@ -115,13 +115,17 @@ class FileHandler(EfosHandler):
         if not os.path.isabs(self.options.archive_path):
             self.options.archive_path = os.path.join(self.options.watch, self.options.archive_path)
 
-        if self.options.archive and not os.path.isdir(self.options.archive_path):
-            log.info("Creating archive directory %s.", self.options.archive_path)
-            os.makedirs(self.options.archive_path)
+        if not self.options.disable_output:
+            if not os.path.isdir(self.options.output_path):
+                log.debug("Creating output directory %s.", self.options.output_path)
+                os.makedirs(self.options.output_path)
+            log.info("Output directory: %s" % self.options.output_path)
 
-        if not self.options.disable_output and not os.path.isdir(self.options.output_path):
-            log.info("Creating output directory %s.", self.options.output_path)
-            os.makedirs(self.options.output_path)
+        if self.options.archive:
+            if not os.path.isdir(self.options.archive_path):
+                log.debug("Creating archive directory %s.", self.options.archive_path)
+                os.makedirs(self.options.archive_path)
+            log.info("Archive directory: %s" % self.options.archive_path)
 
     def process(self, file):
         if self.options.disable_output:

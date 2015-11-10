@@ -108,8 +108,6 @@ class Processor(object):
     def run(self):
         """ """
         log.info("Processor watching %s." % self.options.watch)
-        log.info("Output directory: %s" % self.options.output_path)
-        log.info("Archive directory: %s" % self.options.archive_path)
 
         event_handler = ProcessEventHandler(options=self.options)
         observer = EfosObserver()
