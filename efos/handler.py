@@ -228,8 +228,9 @@ class DropboxHandler(EfosHandler):
             file.write(f)
             f.seek(0)  # not sure why but dropbox would fail with out that, it shouldn't ne read at all.
             upload_path = self.options.dbx_path % file.barcode.data
+            upload_path = os.path.normpath(os.path.join(upload_path, file.get_filename()))
             try:
-                meta_data = self.dbx.files_upload(f, file.get_filename(), autorename=self.options.dbx_autorename)
+                meta_data = self.dbx.files_upload(f, upload_path, autorename=self.options.dbx_autorename)
                 log.info("File saved to Dropbox. REV: %s", meta_data.name)
             except ApiError as ex:
                 log.error(ex)
@@ -238,7 +239,7 @@ class DropboxHandler(EfosHandler):
             log.error("%(type)s: %(msg)s" % {'type': type(ex).__name__, 'msg': ex.message, 'args': ex.args})
         except Exception as ex:
             log.error("%(type)s: %(msg)s" % {'type': type(ex).__name__, 'msg': ex.message, 'args': ex.args})
-            log.error(ex)
+            # log.error(ex)
 
     def archive(self, src_file):
         log.info('Archiving  %(filename)s to Dropbox.' % {'filename': os.path.basename(src_file)})
