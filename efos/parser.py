@@ -313,8 +313,11 @@ class Parser(object):
             log.warning("No efos files found")
 
         for file in self.files:
-            for handler in self.handlers:
-                handler.process(file)
+            if file.page_count == 0:
+                log.warning("%s has no pages. Will not process file." % file.get_filename())
+            else:
+                for handler in self.handlers:
+                    handler.process(file)
 
         # self.archive_delete()
 

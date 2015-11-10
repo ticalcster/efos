@@ -1,3 +1,5 @@
+.. _options-label:
+
 Options
 =======
 
@@ -84,6 +86,7 @@ DropboxHandler Options
 ----------------------
 
 .. include:: options_dropboxhandler.rst
+
 
 FileHandler Options
 -------------------

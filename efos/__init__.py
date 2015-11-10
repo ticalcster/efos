@@ -126,7 +126,7 @@ def get_handler_classes(options):
 def get_options():
     # Config / Arg stuffs
     cap = configargparse.ArgParser(default_config_files=['efos.conf', ], allow_unknown_config_file_keys=True)
-    cap.add_argument('-a', '--archive', action="store_true", help='should we archive the files')
+    cap.add_argument('-a', '--archive', default=True, action="store_true", help='should we archive the files')
     cap.add_argument('-c', '--config', is_config_file=True, help='path to config file')
     cap.add_argument('-d', '--delete', action="store_true", help='delete files after processing')
     cap.add_argument('--delay', default=0, type=int,
