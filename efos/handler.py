@@ -27,14 +27,14 @@ class EfosHandler(object):
         pass
 
     def setup(self):
-        """Called after __init__(). Used to perform global handler actions."""
+        """Called after ``__init__``. Used to perform global handler actions."""
         pass
 
     def process(self, file):
         """
         Function run on each parsed file.
 
-        :param file: :class:`efos.parser.File`
+        :param file: :class:`~efos.parser.File`
         """
         log.debug('%s process not implemented' % self.__class__.__name__)
 
@@ -42,7 +42,7 @@ class EfosHandler(object):
         """
         Function run on the source pdf after parsing is complete.
 
-        :param src_filename: string
+        :param src_filename: ``string``
         """
         log.debug('%s archive not implemented' % self.__class__.__name__)
 
@@ -60,8 +60,8 @@ class HttpHandler(EfosHandler):
         """
         Returns the combined form data from Options and the scanned efos barcode.
 
-        :param file: :class:`efos.parser.File`
-        :return:
+        :param file: :py:class:`~efos.parser.File`
+        :return: ``dict``
         """
         form_data = {}
         if self.options.form_data:
@@ -114,6 +114,14 @@ class FileHandler(EfosHandler):
 
         if not os.path.isabs(self.options.archive_path):
             self.options.archive_path = os.path.join(self.options.watch, self.options.archive_path)
+
+        if self.options.archive and not os.path.isdir(self.options.archive_path):
+            log.info("Creating archive directory %s.", self.options.archive_path)
+            os.makedirs(self.options.archive_path)
+
+        if not self.options.disable_output and not os.path.isdir(self.options.output_path):
+            log.info("Creating output directory %s.", self.options.output_path)
+            os.makedirs(self.options.output_path)
 
     def process(self, file):
         if self.options.disable_output:

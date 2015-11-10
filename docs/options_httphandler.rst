@@ -1,19 +1,36 @@
 url
 ^^^
-default=None, help='url to upload files')
+The url to send the file.
+If this option is left out no upload will be tried.
+
+:Default: ``None``
 
 http-timeout
 ^^^^^^^^^^^^
-default=10, help='time to wait for server to respond')
+Time to wait to find the server.
+
+:Default: ``10``
 
 form-data
 ^^^^^^^^^
-default=None, action="append", help='additional form data to send to server')
+Additional form data to send to server.
+In the config file you can specify multiple like so:
+
+.. code-block:: ini
+
+    form-data=id=something
+    form-data=auth_token=somethingelse
+
+:Default: ``None``
 
 disable-http
 ^^^^^^^^^^^^
-help="Will disable the FileHandler")
+Will disable this file handler.
+
+:Default: ``False``
 
 file-form-name
 ^^^^^^^^^^^^^^
-default="file", help="POST param name for the uploaded file")
+Uploads the file with a custom form param name.
+
+:Default: ``file``

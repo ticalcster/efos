@@ -161,13 +161,26 @@ class TestParserMethods(unittest.TestCase):
         self.assertTrue(os.path.isfile(self.file_600000))
         self.assertTrue(os.path.isfile(self.file_600001))
 
+    def test_parser_archive(self):
+        filename = os.path.join(WATCH_FOLDER, 'doc_multi_archive.pdf')
+        archive_filename = os.path.join(ARCHIVE_FOLDER, 'doc_multi_archive.pdf')
+        copy_file(self.filename, filename)
+        delete_file(archive_filename)
+        self.assertTrue(os.path.exists(filename))  # should
+
+        parser = Parser(filename=filename, options=Options(archive=True, delete=True,
+                                                           file_format="%(id)s_archive.pdf"))
+        parser.archive()
+        self.assertTrue(os.path.exists(archive_filename))  # archived
+
     def test_parser_delete(self):
         filename = os.path.join(WATCH_FOLDER, 'doc_multi_delete.pdf')
         archive_filename = os.path.join(ARCHIVE_FOLDER, 'doc_multi_delete.pdf')
         copy_file(self.filename, filename)
+        self.assertTrue(os.path.exists(filename))  # should exists
         parser = Parser(filename=filename, options=Options(archive=False, delete=True,
                                                            file_format="%(id)s_delete.pdf"))
-
         parser.delete()
         self.assertFalse(os.path.exists(archive_filename))  # archived
         self.assertFalse(os.path.exists(filename))  # deleted
+
